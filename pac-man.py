@@ -1,6 +1,5 @@
 import sys
-import json
-from src.parser import parse_config
+from src.parser import ConfigParser
 
 
 def run() -> None:
@@ -10,7 +9,8 @@ def run() -> None:
     config_path = "config.json"
     try:
         with open(config_path, "r") as file:
-            config = json.load(file)
+            parser = ConfigParser()
+            config = parser.parse(file)
             print(config)
     except FileNotFoundError:
         print(f"File '{config_path}' not found.")

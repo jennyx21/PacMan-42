@@ -1,3 +1,4 @@
+PYTHON = python3
 MAIN = pac-man.py
 CONFIG = config.json
 LINT_CHECK = src/
@@ -6,14 +7,14 @@ install:
 	uv sync
 
 run:
-	uv run python3 $(MAIN) $(CONFIG)
+	uv run $(PYTHON) $(MAIN) $(CONFIG)
 
 debug:
-	uv run python -m pdb -m src
+	uv run $(PYTHON) -m pdb $(MAIN) $(CONFIG)
 
 clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
-	rm -rf .mypy_cache
+	find . -type d -name ".mypy_cache" -exec rm -rf {} +
 
 lint:
 	uv run flake8 $(LINT_CHECK)
