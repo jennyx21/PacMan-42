@@ -2,7 +2,7 @@
     "highscore_filename": "highscores.json",
     "levels": [
         {
-            "level": 1,
+            "levjel": 1,
             "width": 20,
             "height": 20
         },
