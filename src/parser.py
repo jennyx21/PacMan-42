@@ -1,4 +1,9 @@
 import json
+from typing import Any
+
+
+class ConfigError(Exception):
+    pass
 
 
 class LevelsConfig:
@@ -33,8 +38,34 @@ class ConfigParser:
     def __init__(self, filepath: str) -> None:
         self.filepath = filepath
 
-    def strip_comments(self) -> None:
-        pass
-    
+    def _strip_comments(self, to_strip: str) -> str:
+        cleaned: list[str] = []
+        for line in to_strip.splitlines():
+            line = line.strip()
+            if line.startswith("#"):
+                continue
+            cleaned.append(line)
+        cleaned = "\n".join(cleaned)
+        return cleaned
+
     def parse(self) -> GameConfig:
-        pass
+        try:
+            with open(self.filepath, "r") as file:
+                no_comments = self._strip_comments(file.read())
+                config_dict: dict[str, Any] = json.loads(no_comments)
+                if not isinstance(config_dict, dict):
+                    raise ConfigError
+        except json.JSONDecodeError as e:
+            print("Error parsing config file:", e)
+            print("Using default game config.")
+            return GameConfig()
+        except ConfigError:
+            print("ConfigError: Invalid format in config.json.")
+            print("Using default game config.")
+            return GameConfig()
+
+        stored = GameConfig()
+        stored.highscore_filename = config_dict.get(
+            "highscore_filename", "highscores.json")
+
+        return stored
