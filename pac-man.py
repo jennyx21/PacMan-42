@@ -1,6 +1,6 @@
 import os
 import sys
-from src.parser import ConfigError, ConfigParser
+from src.parser import ConfigParser
 
 
 def run() -> None:
@@ -22,8 +22,6 @@ def run() -> None:
             print(config.__dict__)
     except FileNotFoundError:
         print(f"Error: File '{config_path}' not found.")
-    except ConfigError as e:
-        print("ConfigError:", e)
 
 
 if __name__ == "__main__":
