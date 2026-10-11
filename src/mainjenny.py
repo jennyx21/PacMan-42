@@ -1,3 +1,5 @@
+# from mazegenerator.mazegenerator import Mazegenerator
+from drawmaze import DrawMaze
 import random
 from typing import Iterator
 
@@ -153,3 +155,16 @@ class MazeGenerator:
             distance += 1
         print("MazeGenerator Class error: no shortest path found.")
         return
+
+
+def main():
+    maze = MazeGenerator((20, 20))
+    maze_window = DrawMaze(maze.maze)
+    maze_window.window()
+
+    # print(f"maze {maze.maze}")
+    # print(f"entry {maze.maze_entry}")
+
+
+if __name__ == "__main__":
+    main()
