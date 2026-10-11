@@ -55,7 +55,7 @@ class ConfigParser:
             raise ConfigError("'levels' must be a list")
 
         levels_list: list[LevelsConfig] = []
-        max_cells = 50
+        max_cells = 35
 
         for lvl in config_lvl:
             if not isinstance(lvl, dict):
@@ -76,11 +76,11 @@ class ConfigParser:
                 raise ConfigError("'height' must be a positive integer")
 
             if width > max_cells:
-                raise ConfigError(
-                    f"'{max_cells}' is the maximum we take for config width.")
+                raise ConfigError(f"'{max_cells}' is the maximum width "
+                                  "we take to fit the window.")
             elif height > max_cells:
-                raise ConfigError(
-                    f"'{max_cells}' is the maximum we take for config height.")
+                raise ConfigError(f"'{max_cells}' is the maximum width "
+                                  "we take to fit the window.")
 
             if width != height:
                 print(
