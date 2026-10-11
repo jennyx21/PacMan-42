@@ -22,7 +22,7 @@ class MazeLoader:
             raise MazeLoaderError(
                 f"MazeLoaderError: {e}.\nEnsure the wheel is installed with"
                 "'uv pip install <wheel_file>'."
-            ) from e
+            )
 
         try:
             generator = MazeGenerator(
@@ -36,7 +36,7 @@ class MazeLoader:
         except Exception as e:
             raise MazeLoaderError(
                 f"External MazeGenerator crashed during generation: {e}"
-            ) from e
+            )
 
         if (not isinstance(raw_grid, list)
                 or not raw_grid
