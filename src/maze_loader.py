@@ -35,14 +35,15 @@ class MazeLoader:
             raw_grid = generator.maze
         except Exception as e:
             raise MazeLoaderError(
-                f"External MazeGenerator crashed during generation: {e}"
+                f"MazeLoaderError: External MazeGenerator crashed, {e}"
             )
 
         if (not isinstance(raw_grid, list)
                 or not raw_grid
                 or not isinstance(raw_grid[0], list)):
             raise MazeLoaderError(
-                "External MazeGenerator returned an invalid grid structure."
+                "MazeLoaderError: External MazeGenerator returned "
+                "an invalid grid structure."
             )
 
         return MazeData(

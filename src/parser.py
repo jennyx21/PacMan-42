@@ -55,7 +55,7 @@ class ConfigParser:
             raise ConfigError("'levels' must be a list")
 
         levels_list: list[LevelsConfig] = []
-        max_cells = 35
+        max_cells = 25
 
         for lvl in config_lvl:
             if not isinstance(lvl, dict):

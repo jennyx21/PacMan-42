@@ -2,6 +2,7 @@ import os
 import sys
 from src.parser import ConfigParser
 from src.maze_loader import MazeLoader, MazeLoaderError
+from src.drawmaze import DrawMaze
 
 
 def run() -> None:
@@ -27,13 +28,16 @@ def run() -> None:
 
     # just for testing
     try:
-        level = config.levels[0]
+        level = config.levels[5]
         maze_data = MazeLoader.load(
             width=level.width,
             height=level.height,
             seed=config.seed,
         )
         print(f"\n\nmaze generated: {maze_data.width}x{maze_data.height}")
+
+        visualizer = DrawMaze(maze_data.grid)
+        visualizer.window()
     except MazeLoaderError as e:
         print("MazeLoaderError:", e)
         sys.exit(1)
