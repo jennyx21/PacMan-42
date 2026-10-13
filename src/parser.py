@@ -20,6 +20,7 @@ class GameConfig:
     seed: int = 42
     lives: int = 3
     level_max_time: int = 90
+    pacgum: int = 42
     points_per_pacgum: int = 10
     points_per_super_pacgum: int = 50
     points_per_ghost: int = 200
@@ -38,17 +39,28 @@ class ConfigParser:
             if line.startswith("#"):
                 continue
             cleaned.append(line)
-        stripped = "\n".join(cleaned)
-        return stripped
+        return "\n".join(cleaned)
+
+    def _get_value(
+            self, data: dict[str, Any], key: str, expected_type: type) -> Any:
+        if key not in data:
+            raise ConfigError(f"Invalid key for '{key}' in config.json")
+        val = data[key]
+        if not isinstance(val, expected_type):
+            raise ConfigError(f"Invalid type for '{key}' in config.json")
+        return val
 
     def _parse_levels(self, config_lvl: object) -> list[LevelsConfig]:
         if not isinstance(config_lvl, list):
             raise ConfigError("'levels' must be a list")
 
         levels_list: list[LevelsConfig] = []
+        max_cells = 25
+
         for lvl in config_lvl:
             if not isinstance(lvl, dict):
                 raise ConfigError("Each level must be an object")
+
             try:
                 level_id = lvl["level"]
                 width = lvl["width"]
@@ -63,8 +75,26 @@ class ConfigParser:
             if not isinstance(height, int) or height <= 0:
                 raise ConfigError("'height' must be a positive integer")
 
+            if width > max_cells:
+                raise ConfigError(f"'{max_cells}' is the maximum width "
+                                  "we take to fit the window.")
+            elif height > max_cells:
+                raise ConfigError(f"'{max_cells}' is the maximum width "
+                                  "we take to fit the window.")
+
+            if width != height:
+                print(
+                    "Oops! Sorry, Jenny and Weng don't like a game window that"
+                    " is not a square :(")
+                if width > height:
+                    height = width
+                else:
+                    width = height
+                print("So we force it into a square anyway (^o^)/\\(^o^)")
+
             levels_list.append(LevelsConfig(
                 level_id=level_id, width=width, height=height))
+
         return levels_list
 
     def parse(self) -> GameConfig:
@@ -84,15 +114,27 @@ class ConfigParser:
             return GameConfig()
 
         stored = GameConfig()
-        stored.highscore_filename = config_dict.get(
-            "highscore_filename", "highscores.json")
-        stored.seed = config_dict.get("seed", 42)
-        stored.lives = config_dict.get("lives", 3)
-        stored.level_max_time = config_dict.get("level_max_time", 90)
-        stored.points_per_pacgum = config_dict.get("points_per_pacgum", 10)
-        stored.points_per_super_pacgum = config_dict.get(
-            "points_per_super_pacgum", 50)
-        stored.points_per_ghost = config_dict.get("points_per_ghost", 200)
-        stored.levels = self._parse_levels(config_dict.get("levels", []))
+        try:
+            stored.highscore_filename = self._get_value(
+                config_dict, "highscore_filename", str)
+            stored.seed = self._get_value(config_dict, "seed", int)
+            stored.lives = self._get_value(config_dict, "lives", int)
+            stored.level_max_time = self._get_value(
+                config_dict, "level_max_time", int)
+            stored.pacgum = self._get_value(config_dict, "pacgum", int)
+            stored.points_per_pacgum = self._get_value(
+                config_dict, "points_per_pacgum", int)
+            stored.points_per_super_pacgum = self._get_value(
+                config_dict, "points_per_super_pacgum", int)
+            stored.points_per_ghost = self._get_value(
+                config_dict, "points_per_ghost", int)
+
+            if "levels" not in config_dict:
+                raise ConfigError("Invalid key for 'levels' in config.json")
+            stored.levels = self._parse_levels(config_dict["levels"])
+
+        except ConfigError as e:
+            print("ConfigError:", e)
+            print("Using default game config for invalid and/or missing keys.")
 
         return stored

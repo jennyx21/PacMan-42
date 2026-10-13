@@ -1,6 +1,8 @@
 import os
 import sys
-from src.parser import ConfigError, ConfigParser
+from src.parser import ConfigParser
+from src.maze_loader import MazeLoader, MazeLoaderError
+from src.drawmaze import DrawMaze
 
 
 def run() -> None:
@@ -13,7 +15,7 @@ def run() -> None:
         print("Try again with: uv run python3 pac-man.py config.json.")
         sys.exit(1)
 
-    config_path = "config.json"
+    config_path = sys.argv[1]
     try:
         with open(config_path, "r"):
             parser = ConfigParser(config_path)
@@ -22,8 +24,23 @@ def run() -> None:
             print(config.__dict__)
     except FileNotFoundError:
         print(f"Error: File '{config_path}' not found.")
-    except ConfigError as e:
-        print("ConfigError:", e)
+        sys.exit(1)
+
+    # just for testing
+    try:
+        level = config.levels[5]
+        maze_data = MazeLoader.load(
+            width=level.width,
+            height=level.height,
+            seed=config.seed,
+        )
+        print(f"\n\nmaze generated: {maze_data.width}x{maze_data.height}")
+
+        visualizer = DrawMaze(maze_data.grid)
+        visualizer.window()
+    except MazeLoaderError as e:
+        print("MazeLoaderError:", e)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
