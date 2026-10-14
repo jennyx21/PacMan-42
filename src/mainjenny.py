@@ -158,7 +158,7 @@ class MazeGenerator:
 
 
 def main():
-    maze = MazeGenerator((5, 5))
+    maze = MazeGenerator((14, 14))
     maze_window = DrawMaze(maze.maze)
     maze_window.window()
 
