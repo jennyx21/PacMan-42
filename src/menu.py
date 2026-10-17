@@ -4,7 +4,11 @@ import pygame_menu.events
 
 
 class GameMenu:
-    def __init__(self, surface: pygame.Surface, title: str = "Pac-Man") -> None:
+    def __init__(
+            self,
+            surface: pygame.Surface,
+            title: str = "Pac-Man"
+    ) -> None:
         self.surface = surface
         self.width, self.height = surface.get_size()
         self.menu = pygame_menu.Menu(
