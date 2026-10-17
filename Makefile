@@ -5,6 +5,7 @@ LINT_CHECK = src/
 
 install:
 	uv sync
+	@if [ -f src/mazegenerator*.whl ]; then UV_SKIP_WHEEL_FILENAME_CHECK=1 uv pip install src/mazegenerator*.whl; fi
 
 run:
 	uv run $(PYTHON) $(MAIN) $(CONFIG)
