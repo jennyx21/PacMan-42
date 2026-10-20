@@ -1,4 +1,4 @@
-PYTHON = python3
+PYTHON = python3.13
 MAIN = pac-man.py
 CONFIG = config.json
 LINT_CHECK = src/
