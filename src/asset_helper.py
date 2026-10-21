@@ -6,7 +6,6 @@ def asset_loader(name: str, direction: str):
 
     loaded_assets = []
     asset_dir = Path(f"src/assets/{name}_assets")
-    print(asset_dir)
     files = sorted(asset_dir.glob(f"{name}_{direction}*.png"))
     for i in files:
         loaded_assets.append(pygame.image.load(str(i)))
