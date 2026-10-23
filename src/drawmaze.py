@@ -2,6 +2,7 @@ import pygame as pg
 from src.player_mechanics import Game
 from src.pacman import PacMan
 
+
 class DrawMaze:
     def __init__(self, maze: list[list[int]]):
         self.maze = maze
@@ -14,8 +15,8 @@ class DrawMaze:
         cell_size = whidth / len(self.maze)
         screen = pg.display.set_mode((whidth, height))
         pg.display.set_caption("Pac Man")
-        pacman = PacMan(screen)
         game = Game()
+        pacman = PacMan(screen, game)
         running = True
 
         while running:
@@ -85,3 +86,5 @@ class DrawMaze:
             pg.display.flip()
             clock.tick(60)
     pg.quit()
+
+    def walls()

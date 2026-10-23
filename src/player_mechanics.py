@@ -1,6 +1,3 @@
-import pygame as pg
-
-
 class Game():
     def __init__(self):
         self.start = False
@@ -10,6 +7,6 @@ class Game():
 
     def update_start(self):
         self.start = True
+        return self.start
 
     # def update_direction:
-        
