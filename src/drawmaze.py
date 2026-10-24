@@ -1,68 +1,6 @@
 import pygame as pg
-from pygame import surface
-from src.asset_helper import asset_loader
-# from dataclasses import dataclass
-
-# dataclass
-# class Cells:
-#     y: int
-#     x: int
-#     walls: list[int]
-
-
-class PacMan(pg.sprite.Sprite):
-    def __init__(self, screen: surface, size: float):
-        super().__init__()
-        self.screen = screen
-        self.sprite = asset_loader("Pac-Man", "right")
-        self.start = False
-        self.size = size
-        self.current = 0
-
-    def draw_pacman(self, x: int, y: int):
-        speed = 0.5
-        key = pg.key.get_pressed()
-        if self.start is False:
-            self.x = x
-            self.y = y
-            self.direction = 0
-            self.image = self.sprite[0]
-            self.rect = self.image.get_rect()
-            self.rect.topleft = (self.x, self.y)
-            if key[pg.K_SPACE] or key[pg.K_KP_ENTER]:
-                self.start = True
-
-        if self.start is True:
-            if self.current < len(self.sprite):
-                self.image = self.sprite[self.current]
-            else:
-                self.current = 0
-                self.image = self.sprite[self.current]
-            self.rect = self.image.get_rect()
-            self.rect.topleft = (self.x, self.y)
-            
-            if key[pg.K_w] or key[pg.K_UP]:
-                self.direction = 1
-            elif key[pg.K_d] or key[pg.K_RIGHT]:
-                self.direction = 2
-            elif key[pg.K_s] or key[pg.K_DOWN]:
-                self.direction = 4
-            elif key[pg.K_a] or key[pg.K_LEFT]:
-                self.direction = 8
-
-            if self.direction == 1:
-                self.y -= speed
-            elif self.direction == 2:
-                self.x += speed
-            elif self.direction == 4:
-                self.y += speed
-            elif self.direction == 8:
-                self.x -= speed
-
-            self.current += 1
-        self.screen.blit(self.image, self.rect)
-
-        return
+from src.player_mechanics import Game
+from src.pacman import PacMan
 
 
 class DrawMaze:
@@ -77,17 +15,21 @@ class DrawMaze:
         cell_size = whidth / len(self.maze)
         screen = pg.display.set_mode((whidth, height))
         pg.display.set_caption("Pac Man")
-        pacman_size = 150 / len(self.maze)
-        pacman = PacMan(screen, pacman_size)
+        game = Game()
+        pacman = PacMan(screen, game)
         running = True
 
         while running:
             for event in pg.event.get():
                 if event.type is pg.QUIT:
                     running = False
+
             keys = pg.key.get_pressed()
             if keys[pg.K_ESCAPE]:
                 running = False
+            if keys[pg.K_SPACE] or keys[pg.K_KP_ENTER]:
+                game.update_start()
+
             screen.fill((5, 0, 25))
             x = 0
             y = 0
@@ -136,11 +78,13 @@ class DrawMaze:
                         pg.draw.line(screen, (175, 170, 255),
                                      (y, x), (y, x + cell_size), 2)
                 i += 1
-            pacman.draw_pacman(int((((len(self.maze) + 1) // 2) * cell_size) -
-                               (cell_size / 2)),
-                               int((((len(self.maze) + 1) // 2) * cell_size))
-                               - (cell_size / 2))
+            pacman.draw_pacman(int(((len(self.maze) // 2) * cell_size) +
+                               cell_size / 6),
+                               int(((len(self.maze) // 2) * cell_size)) +
+                               cell_size / 6)
 
             pg.display.flip()
             clock.tick(60)
     pg.quit()
+
+    def walls()
