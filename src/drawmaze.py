@@ -1,4 +1,5 @@
 import pygame as pg
+from pygame import Surface
 from src.player_mechanics import Game
 from src.pacman import PacMan
 
@@ -13,6 +14,7 @@ class DrawMaze:
         whidth: int = 800
         height: int = 800
         cell_size = whidth / len(self.maze)
+        middle = len(self.maze) / 2
         screen = pg.display.set_mode((whidth, height))
         pg.display.set_caption("Pac Man")
         game = Game()
@@ -24,67 +26,54 @@ class DrawMaze:
                 if event.type is pg.QUIT:
                     running = False
 
+            start, pause = game.game_info()
             keys = pg.key.get_pressed()
             if keys[pg.K_ESCAPE]:
                 running = False
             if keys[pg.K_SPACE] or keys[pg.K_KP_ENTER]:
-                game.update_start()
+                if start is not True:
+                    game.update_start()
+                elif start is True:
+                    game.update_start()
 
             screen.fill((5, 0, 25))
-            x = 0
-            y = 0
-            i = 0
-            for a in range(len(self.maze)):
-                for b in range(len(self.maze[i])):
-                    cell = self.maze[b][a]
-                    x = b * cell_size
-                    y = a * cell_size
-                    if cell & 1:
-                        pg.draw.line(screen, (100, 90, 175), (y - 3, x),
-                                     (y + cell_size + 3, x), 8)
-                    if cell & 2:
-                        pg.draw.line(screen, (100, 90, 175),
-                                     (y + cell_size, x - 3),
-                                     (y + cell_size, x + cell_size + 3), 8)
-                    if cell & 4:
-                        pg.draw.line(screen, (100, 90, 175),
-                                     (y, x + cell_size),
-                                     (y + cell_size, x + cell_size), 8)
-                    if cell & 8:
-                        pg.draw.line(screen, (100, 90, 175),
-                                     (y, x), (y, x + cell_size), 8)
-                i += 1
+            self.draw_walls(cell_size, screen, (100, 90, 175), 8, 3)
+            self.draw_walls(cell_size, screen, (175, 170, 255), 3)
 
-            x = 0
-            y = 0
-            i = 0
-            for a in range(len(self.maze)):
-                for b in range(len(self.maze[i])):
-                    cell = self.maze[b][a]
-                    x = b * cell_size
-                    y = a * cell_size
-                    if cell & 1:
-                        pg.draw.line(screen, (175, 170, 255), (y, x),
-                                     (y + cell_size, x), 2)
-                    if cell & 2:
-                        pg.draw.line(screen, (175, 170, 255),
-                                     (y + cell_size, x),
-                                     (y + cell_size, x + cell_size), 2)
-                    if cell & 4:
-                        pg.draw.line(screen, (175, 170, 255),
-                                     (y, x + cell_size),
-                                     (y + cell_size, x + cell_size), 2)
-                    if cell & 8:
-                        pg.draw.line(screen, (175, 170, 255),
-                                     (y, x), (y, x + cell_size), 2)
-                i += 1
-            pacman.draw_pacman(int(((len(self.maze) // 2) * cell_size) +
-                               cell_size / 6),
-                               int(((len(self.maze) // 2) * cell_size)) +
-                               cell_size / 6)
+            pacman.draw_pacman(int(middle * cell_size),
+                               int(middle * cell_size))
 
             pg.display.flip()
             clock.tick(60)
-    pg.quit()
+        pg.quit()
 
-    def walls()
+    def draw_walls(self,
+                   cell_size: float,
+                   screen: Surface,
+                   color: tuple[int, int, int],
+                   size: int,
+                   length: int = 0):
+        x = 0
+        y = 0
+        i = 0
+        for a in range(len(self.maze)):
+            for b in range(len(self.maze[i])):
+                cell = self.maze[b][a]
+                x = b * cell_size
+                y = a * cell_size
+                if cell & 1:
+                    pg.draw.line(screen, color, (y - length, x),
+                                 (y + cell_size + length, x), size)
+                if cell & 2:
+                    pg.draw.line(screen, color,
+                                 (y + cell_size, x - length),
+                                 (y + cell_size, x + cell_size + length), size)
+                if cell & 4:
+                    pg.draw.line(screen, color,
+                                 (y, x + cell_size),
+                                 (y + cell_size, x + cell_size), size)
+                if cell & 8:
+                    pg.draw.line(screen, color,
+                                 (y, x), (y, x + cell_size), size)
+            i += 1
+        return
