@@ -1,34 +1,85 @@
 import pygame as pg
-from pygame import surface
+from pygame import Surface
 from src.player_mechanics import Game
 from src.asset_helper import asset_loader
 
 
+UP = 1
+RIGHT = 2
+DOWN = 4
+LEFT = 8
+
+OPPOSITE = {UP: DOWN, RIGHT: LEFT, DOWN: UP, LEFT: RIGHT}
+
+
 class PacMan(pg.sprite.Sprite, Game):
-    def __init__(self, screen: surface, game: Game):
+    def __init__(self, screen: Surface,
+                 game: Game,
+                 maze: list[list[int]],
+                 cell_size: float,
+                 start_cell: tuple[int, int]):
         super().__init__()
         self.screen = screen
         self.game = game
+        self.maze = maze
+        self.cell_size = cell_size
         self.sprite_right = asset_loader("Pac-Man", "right")
         self.sprite_down = asset_loader("Pac-Man", "down")
         self.sprite_left = asset_loader("Pac-Man", "left")
         self.sprite_up = asset_loader("Pac-Man", "up")
+
         self.current_sprite = self.sprite_right
         self.current = 0
+        self.col, self.row = start_cell
+        self.x, self.y = self.cell_center(self.col, self.row)
+        self.direction = 0
+        self.next_direction = 0
 
+    def cell_center(self, col: int, row: int) -> tuple[float, float]:
+        return ((col + 0.5) * self.cell_size), (row + 0.5) * self.cell_size
+
+    def current_cell(self) -> tuple[int, int]:
+        return int(self.x // self.cell_size), int(self.y // self.cell_size)
+
+    def read_keys(self):
+        keys = pg.key.get_pressed()
+        if keys[pg.K_w] or keys[pg.K_UP]:
+            self.direction = UP
+        elif keys[pg.K_d] or keys[pg.K_RIGHT]:
+            self.direction = RIGHT
+        elif keys[pg.K_s] or keys[pg.K_DOWN]:
+            self.direction = DOWN
+        elif keys[pg.K_a] or keys[pg.K_LEFT]:
+            self.direction = LEFT
+
+    def update_sprite(self, direction: int):
+        if direction == UP:
+            self.current_sprite = self.sprite_up
+        elif direction == RIGHT:
+            self.current_sprite = self.sprite_right
+        elif direction == DOWN:
+            self.current_sprite = self.sprite_down
+        elif direction == LEFT:
+            self.current_sprite = self.sprite_left
+
+    def is_wall(self, direction: int) -> bool:
+        col, row = self.current_cell()
+        return self.maze[row][col] & direction != 0
+
+    def can_move(self, direction: int) -> bool:
+        
+        
     def draw_pacman(self, x: int, y: int):
         speed = 1.2
-        key = pg.key.get_pressed()
         start, pause = self.game.game_info()
         if start is False:
-            self.x = x
-            self.y = y
-            self.direction = 0
             self.image = self.current_sprite[0]
             self.rect = self.image.get_rect()
             self.rect.center = (round(self.x), round(self.y))
 
         if start is True and pause is False:
+            self.read_keys()
+            self.update_sprite(self.direction)
             if self.current < len(self.current_sprite):
                 self.image = self.current_sprite[int(self.current)]
             else:
@@ -36,21 +87,8 @@ class PacMan(pg.sprite.Sprite, Game):
                 self.image = self.current_sprite[int(self.current)]
             self.rect = self.image.get_rect()
             self.rect.center = (round(self.x), round(self.y))
-            print(self.x)
-            print(round(self.x))
-            if key[pg.K_w] or key[pg.K_UP]:
-                self.direction = 1
-                self.current_sprite = self.sprite_up
-            elif key[pg.K_d] or key[pg.K_RIGHT]:
-                self.direction = 2
-                self.current_sprite = self.sprite_right
-            elif key[pg.K_s] or key[pg.K_DOWN]:
-                self.direction = 4
-                self.current_sprite = self.sprite_down
-            elif key[pg.K_a] or key[pg.K_LEFT]:
-                self.direction = 8
-                self.current_sprite = self.sprite_left
 
+        if self.can_move(self.direction):
             if self.direction == 1:
                 self.y -= speed
             elif self.direction == 2:

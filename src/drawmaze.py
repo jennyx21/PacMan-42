@@ -18,7 +18,7 @@ class DrawMaze:
         screen = pg.display.set_mode((whidth, height))
         pg.display.set_caption("Pac Man")
         game = Game()
-        pacman = PacMan(screen, game)
+        pacman = PacMan(screen, game, self.maze, cell_size, (int(middle), int(middle)))
         running = True
 
         while running:
@@ -53,9 +53,9 @@ class DrawMaze:
                    color: tuple[int, int, int],
                    size: int,
                    length: int = 0):
-        x = 0
-        y = 0
-        i = 0
+        x: float = 0
+        y: float = 0
+        i: int = 0
         for a in range(len(self.maze)):
             for b in range(len(self.maze[i])):
                 cell = self.maze[b][a]
