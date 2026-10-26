@@ -3,6 +3,7 @@ import sys
 from src.parser import ConfigParser
 from src.maze_loader import MazeLoader, MazeLoaderError
 from src.drawmaze import DrawMaze
+from src.game_manager import GameManager
 
 
 def run() -> None:
@@ -26,21 +27,24 @@ def run() -> None:
         print(f"Error: File '{config_path}' not found.")
         sys.exit(1)
 
-    # just for testing
-    try:
-        level = config.levels[5]
-        maze_data = MazeLoader.load(
-            width=level.width,
-            height=level.height,
-            seed=config.seed,
-        )
-        print(f"\n\nmaze generated: {maze_data.width}x{maze_data.height}")
+    # # just for testing
+    # try:
+    #     level = config.levels[5]
+    #     maze_data = MazeLoader.load(
+    #         width=level.width,
+    #         height=level.height,
+    #         seed=config.seed,
+    #     )
+    #     print(f"\n\nmaze generated: {maze_data.width}x{maze_data.height}")
 
-        visualizer = DrawMaze(maze_data.grid)
-        visualizer.window()
-    except MazeLoaderError as e:
-        print("MazeLoaderError:", e)
-        sys.exit(1)
+    #     visualizer = DrawMaze(maze_data.grid)
+    #     visualizer.window()
+    # except MazeLoaderError as e:
+    #     print("MazeLoaderError:", e)
+    #     sys.exit(1)
+
+    game = GameManager(config)
+    game.run()
 
 
 if __name__ == "__main__":

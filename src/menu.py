@@ -17,25 +17,26 @@ class GameMenu:
             height=self.height
         )
         self.build_menu()
-        self.start_game = False
+        self.action = None
 
     def build_menu(self) -> None:
         self.menu.add.button('Play', self.play_function)
         self.menu.add.button('Highscores', self.show_highscores)
         self.menu.add.button('Quit', pygame_menu.events.EXIT)
 
-    def play_function(self) -> bool:
+    def play_function(self) -> None:
+        self.action = "PLAY"
         self.menu.disable()
-        self.start_game = True
-        return self.start_game
 
     def show_highscores(self) -> None:
-        print("Highscores")
+        self.action = "HIGHSCORES"
+        self.menu.disable()
 
-    def run(self) -> bool:
+    def run(self) -> str:
+        self.action = "QUIT"
         self.menu.enable()
         self.menu.mainloop(self.surface)
-        return self.start_game
+        return self.action
 
 
 if __name__ == "__main__":
