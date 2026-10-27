@@ -99,7 +99,6 @@ class PacMan(pg.sprite.Sprite, Game):
             self.rect = self.image.get_rect()
             self.rect.center = (round(self.x), round(self.y))
 
-
             if self.next_direction == OPPOSITE[self.direction]:
                 self.direction = self.next_direction
 

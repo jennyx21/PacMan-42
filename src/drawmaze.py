@@ -2,18 +2,21 @@ import pygame as pg
 from pygame import Surface
 from src.player_mechanics import Game
 from src.pacman import PacMan
+from src.pacgum import Pacgum
 
 
 class DrawMaze:
     def __init__(self, maze: list[list[int]],
                  pacgum: int,
-                 pacsupergum: int, 
+                 superpacgum: int,
                  points_pg: int,
-                 points_psg: int):
+                 points_spg: int):
         self.maze = maze
         self.pacgum = pacgum
-        self.pacsupergum = pacsupergum
-        print(self.pacgum)
+        self.superpacgum = superpacgum
+        self.points_pacgum = points_pg
+        self.points_super_pacgum = points_spg
+
     def window(self):
         pg.init()
         clock = pg.time.Clock()
@@ -24,7 +27,19 @@ class DrawMaze:
         screen = pg.display.set_mode((whidth, height))
         pg.display.set_caption("Pac Man")
         game = Game()
-        pacman = PacMan(screen, game, self.maze, cell_size, (int(middle), int(middle)))
+        pacman = PacMan(screen,
+                        game,
+                        self.maze,
+                        cell_size,
+                        (int(middle), int(middle)))
+        pacgum = Pacgum(screen,
+                        self.pacgum,
+                        self.superpacgum,
+                        self.points_pacgum,
+                        self.points_super_pacgum,
+                        self.maze,
+                        cell_size,
+                        pacman)
         running = True
 
         while running:
@@ -48,6 +63,7 @@ class DrawMaze:
 
             pacman.draw_pacman(int(middle * cell_size),
                                int(middle * cell_size))
+            pacgum.draw_pacgum()
 
             pg.display.flip()
             clock.tick(60)
