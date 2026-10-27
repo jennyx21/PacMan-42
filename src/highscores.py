@@ -1,5 +1,6 @@
 import json
 from typing import Any
+import pygame as pg
 
 
 class HighscoreRecord:
@@ -19,11 +20,9 @@ class HighscoreRecord:
         return True
 
     def _score_is_valid(self, score: int) -> bool:
-        if not isinstance(score, int):
+        if isinstance(score, bool) or not isinstance(score, int):
             return False
-        elif score < 0:
-            return False
-        return True
+        return score >= 0
 
     def load_file(self) -> None:
         try:
@@ -69,6 +68,69 @@ class HighscoreRecord:
                 json.dump(self.scores, f, indent=4)
         except Exception as e:
             print(e)
+
+
+class Leaderboard:
+    def __init__(self, record: HighscoreRecord) -> None:
+        self.record = record
+        self.font_title = pg.font.Font(None, 48)
+        self.font_entry = pg.font.Font(None, 36)
+        self.font_footer = pg.font.Font(None, 24)
+
+    def display(self, screen: pg.Surface, clock: pg.time.Clock) -> str:
+        self.record.load_file()
+        width, height = screen.get_size()
+        viewing = True
+
+        while viewing:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    return "QUIT"
+                elif event.type == pg.KEYDOWN:
+                    if event.key in (pg.K_ESCAPE, pg.K_RETURN, pg.K_SPACE):
+                        return "BACK"
+
+            screen.fill((5, 0, 25))
+
+            title_surf = self.font_title.render(
+                "HIGH SCORES", True, (255, 255, 0))
+            screen.blit(title_surf, title_surf.get_rect(
+                center=(width // 2, 80)))
+
+            y_pos = 160
+            if not self.record.scores:
+                no_scores = self.font_entry.render(
+                    "No scores yet!", True, (200, 200, 200))
+                screen.blit(no_scores, no_scores.get_rect(
+                    center=(width // 2, y_pos)))
+            else:
+                for rank, entry in enumerate(self.record.scores[:10], start=1):
+                    name = entry.get("name", "Unknown")
+                    score = entry.get("score", 0)
+                    text = f"{rank:2d}. {name:<12} {score:>6}"
+                    surf = self.font_entry.render(
+                        text, True, (255, 255, 255))
+                    screen.blit(surf, surf.get_rect(
+                        center=(width // 2, y_pos)))
+                    y_pos += 45
+
+            footer = self.font_footer.render(
+                "Press ESC or SPACE to return", True, (150, 150, 150))
+            screen.blit(footer, footer.get_rect(
+                center=(width // 2, height - 50)))
+
+            pg.display.flip()
+            clock.tick(60)
+
+        return "BACK"
+
+
+class NameInput:
+    def __init__(self) -> None:
+        pass
+    
+    def get_name(self) -> str:
+        pass
 
 
 if __name__ == "__main__":
