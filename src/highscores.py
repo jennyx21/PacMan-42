@@ -125,6 +125,14 @@ class Leaderboard:
         return "BACK"
 
 
+class NameInput:
+    def __init__(self) -> None:
+        pass
+    
+    def get_name(self) -> str:
+        pass
+
+
 if __name__ == "__main__":
     hs = HighscoreRecord("highscores.json")
     hs.load_file()

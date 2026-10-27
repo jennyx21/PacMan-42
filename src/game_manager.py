@@ -1,6 +1,6 @@
 import pygame as pg
 from enum import Enum, auto
-from src.highscores import HighscoreRecord, Leaderboard
+from src.highscores import HighscoreRecord, Leaderboard, NameInput
 from src.menu import GameMenu
 # import DrawMaze
 # import GameLevel
@@ -31,6 +31,7 @@ class GameManager:
         self.config = config
         self.highscores = HighscoreRecord("highscores.json")
         self.leaderboard = Leaderboard(self.highscores)
+        self.name_input = NameInput(self.highscores)
 
         # current
         self.state = GameState.MENU
@@ -70,12 +71,11 @@ class GameManager:
         pass
 
     def _handle_name_input(self) -> None:
-        # render prompt: "Enter your name:"
-        # on Enter:
-        # self.highscores.add_score(name, self.current_score)
-        # self.highscores.save_to_file()
-        # self.state = GameState.HIGHSCORES
-        pass
+        action = self.name_input.get_name()
+        if action == "QUIT":
+            self.running = False
+        else:
+            self.state = GameState.HIGHSCORES
 
     def _handle_highscores(self) -> None:
         action = self.leaderboard.display(self.screen, self.clock)
