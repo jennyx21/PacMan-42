@@ -37,7 +37,11 @@ def run() -> None:
         )
         print(f"\n\nmaze generated: {maze_data.width}x{maze_data.height}")
 
-        visualizer = DrawMaze(maze_data.grid)
+        visualizer = DrawMaze(maze_data.grid,
+                              config.pacgum,
+                              4,
+                              config.points_per_pacgum,
+                              config.points_per_super_pacgum)
         visualizer.window()
     except MazeLoaderError as e:
         print("MazeLoaderError:", e)

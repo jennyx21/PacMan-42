@@ -98,13 +98,12 @@ class PacMan(pg.sprite.Sprite, Game):
                 self.image = self.current_sprite[int(self.current)]
             self.rect = self.image.get_rect()
             self.rect.center = (round(self.x), round(self.y))
-            print(self.next_direction)
-            print(self.can_move(self.next_direction))
+
 
             if self.next_direction == OPPOSITE[self.direction]:
                 self.direction = self.next_direction
 
-            if 0 <= self.distance_to_center() < speed: 
+            if 0 <= self.distance_to_center() < speed:
                 col, row = self.current_cell()
                 self.x, self.y = self.cell_center(col, row)
                 if self.can_move(self.next_direction):

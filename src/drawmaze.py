@@ -5,9 +5,15 @@ from src.pacman import PacMan
 
 
 class DrawMaze:
-    def __init__(self, maze: list[list[int]]):
+    def __init__(self, maze: list[list[int]],
+                 pacgum: int,
+                 pacsupergum: int, 
+                 points_pg: int,
+                 points_psg: int):
         self.maze = maze
-
+        self.pacgum = pacgum
+        self.pacsupergum = pacsupergum
+        print(self.pacgum)
     def window(self):
         pg.init()
         clock = pg.time.Clock()
