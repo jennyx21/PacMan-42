@@ -31,6 +31,8 @@ class PacMan(pg.sprite.Sprite, Game):
         self.current_sprite = self.sprite_right
         self.current = 0
         self.col, self.row = start_cell
+        self.old_col = 0
+        self.old_row = 0
         self.x, self.y = self.cell_center(self.col, self.row)
         self.direction = 0
         self.next_direction = 0
@@ -40,6 +42,12 @@ class PacMan(pg.sprite.Sprite, Game):
 
     def current_cell(self) -> tuple[int, int]:
         return int(self.x // self.cell_size), int(self.y // self.cell_size)
+
+    def new_cell(self, row, col):
+        if not row == self.old_row or not col == self.old_col:
+            self.old_row = row
+            self.old_col = col
+            self.next_direction = self.direction
 
     def read_keys(self):
         keys = pg.key.get_pressed()
@@ -83,6 +91,7 @@ class PacMan(pg.sprite.Sprite, Game):
 
     def draw_pacman(self, x: int, y: int):
         speed = 1.2
+        col, row = self.current_cell()
         start, pause = self.game.game_info()
         if start is False:
             self.image = self.current_sprite[0]
@@ -91,6 +100,7 @@ class PacMan(pg.sprite.Sprite, Game):
 
         if start is True and pause is False:
             self.read_keys()
+            self.new_cell(row, col)
             if self.current < len(self.current_sprite):
                 self.image = self.current_sprite[int(self.current)]
             else:
@@ -103,7 +113,6 @@ class PacMan(pg.sprite.Sprite, Game):
                 self.direction = self.next_direction
 
             if 0 <= self.distance_to_center() < speed:
-                col, row = self.current_cell()
                 self.x, self.y = self.cell_center(col, row)
                 if self.can_move(self.next_direction):
                     self.direction = self.next_direction

@@ -12,7 +12,7 @@ class Pacgum(pg.sprite.Sprite):
                  points_pg: int,
                  points_spg: int,
                  maze: list[list[int]],
-                 cell_size: int, 
+                 cell_size: int,
                  pacman: PacMan):
         super().__init__()
         self.screen = screen
@@ -26,7 +26,7 @@ class Pacgum(pg.sprite.Sprite):
         self.distrinuted_pacgum = self._distribute()
 
     def _distribute(self):
-        i = 0 
+        i = 0
         pacgum = set()
         while i <= self.number_pacgum:
             x = random.randint(0, len(self.maze) - 1)
@@ -43,7 +43,6 @@ class Pacgum(pg.sprite.Sprite):
             return True
         return False
 
-
     def draw_pacgum(self):
         gum = pg.Surface((5, 5))
         gum_list = []
@@ -57,4 +56,3 @@ class Pacgum(pg.sprite.Sprite):
         for i in gum_list:
             g, r = i
             self.screen.blit(g, r)
-        
