@@ -3,6 +3,7 @@ from pygame import Surface
 from src.player_mechanics import Game
 from src.pacman import PacMan
 from src.pacgum import Pacgum
+from src.ghosts import Ghosts
 
 
 class DrawMaze:
@@ -27,6 +28,10 @@ class DrawMaze:
         screen = pg.display.set_mode((whidth, height))
         pg.display.set_caption("Pac Man")
         game = Game()
+        ghosts = Ghosts(screen,
+                        game,
+                        self.maze,
+                        cell_size)
         pacman = PacMan(screen,
                         game,
                         self.maze,
@@ -64,6 +69,7 @@ class DrawMaze:
             pacman.draw_pacman(int(middle * cell_size),
                                int(middle * cell_size))
             pacgum.draw_pacgum()
+            ghosts.draw_ghosts()
 
             pg.display.flip()
             clock.tick(60)
