@@ -29,7 +29,7 @@ def run() -> None:
 
     # just for testing
     try:
-        level = config.levels[5]
+        level = config.levels[9]
         maze_data = MazeLoader.load(
             width=level.width,
             height=level.height,

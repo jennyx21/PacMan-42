@@ -1,4 +1,4 @@
-import time 
+import time
 
 
 class Game():
@@ -6,10 +6,10 @@ class Game():
         self.start = False
         self.pause = False
 
-    def game_info(self):
+    def game_info(self) -> tuple[bool, bool]:
         return self.start, self.pause
 
-    def update_start(self):
+    def update_start(self) -> None:
         if self.start is False:
             self.start = True
         elif self.start is True and self.pause is False:
@@ -17,7 +17,3 @@ class Game():
         elif self.start is True and self.pause is True:
             self.pause = False
         time.sleep(0.2)
-        return self.start
-
-
-    # def update_direction:

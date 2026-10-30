@@ -26,17 +26,14 @@ class Pacgum(pg.sprite.Sprite):
         self.distrinuted_pacgum = self._distribute()
 
     def _distribute(self):
-        i = 0
-        pacgum = set()
-        while i <= self.number_pacgum:
-            x = random.randint(0, len(self.maze) - 1)
-            y = random.randint(0, len(self.maze) - 1)
-            if self.maze[x][y] != 15:
-                if (x, y) not in pacgum:
-                    pacgum.add(((x * self.cell_size) - (self.cell_size / 2),
-                                (y * self.cell_size) - (self.cell_size / 2)))
-                    i += 1
-        return pacgum
+        cells = [(x, y)
+                 for y in range(len(self.maze))
+                 for x in range(len(self.maze[0]))
+                 if self.maze[y][x] != 15]
+        chosen = random.sample(cells, min(self.number_pacgum, len(cells)))
+        return {((x + 0.5) * self.cell_size, (y + 0.5) * self.cell_size)
+                for x, y in chosen}
+
 
     def _detect_coaliton(self, rect):
         if rect.colliderect(self.pacman):

@@ -28,10 +28,6 @@ class DrawMaze:
         screen = pg.display.set_mode((whidth, height))
         pg.display.set_caption("Pac Man")
         game = Game()
-        ghosts = Ghosts(screen,
-                        game,
-                        self.maze,
-                        cell_size)
         pacman = PacMan(screen,
                         game,
                         self.maze,
@@ -42,6 +38,11 @@ class DrawMaze:
                         self.superpacgum,
                         self.points_pacgum,
                         self.points_super_pacgum,
+                        self.maze,
+                        cell_size,
+                        pacman)
+        ghosts = Ghosts(screen,
+                        game,
                         self.maze,
                         cell_size,
                         pacman)
