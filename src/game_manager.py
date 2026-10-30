@@ -68,12 +68,14 @@ class GameManager:
         # when game ends (death / win):
         # self.current_score = final_score
         # self.state = GameState.NAME_INPUT
-        pass
 
     def _handle_name_input(self) -> None:
-        action = self.name_input.get_name()
+        action = self.name_input.get_name(
+            self.screen, self.clock, self.current_score)
         if action == "QUIT":
             self.running = False
+        elif action == "BACK":
+            self.state = GameState.MENU
         else:
             self.state = GameState.HIGHSCORES
 

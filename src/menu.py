@@ -22,7 +22,7 @@ class GameMenu:
     def build_menu(self) -> None:
         self.menu.add.button('Play', self.play_function)
         self.menu.add.button('Highscores', self.show_highscores)
-        self.menu.add.button('Quit', pygame_menu.events.EXIT)
+        self.menu.add.button('Quit', self.quit_function)
 
     def play_function(self) -> None:
         self.action = "PLAY"
@@ -30,6 +30,10 @@ class GameMenu:
 
     def show_highscores(self) -> None:
         self.action = "HIGHSCORES"
+        self.menu.disable()
+
+    def quit_function(self) -> None:
+        self.action = "QUIT"
         self.menu.disable()
 
     def run(self) -> str:

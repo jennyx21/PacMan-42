@@ -83,7 +83,7 @@ class Leaderboard:
 
         screen.fill((5, 0, 25))
         title_surf = self.font_title.render(
-            "HIGH SCORES", True, (255, 255, 0))
+            "LEADERBOARD", True, (255, 255, 0))
         screen.blit(title_surf, title_surf.get_rect(
             center=(width // 2, 80)))
 
@@ -105,7 +105,7 @@ class Leaderboard:
                 y_pos += 45
 
         footer = self.font_footer.render(
-            "Press ESC or SPACE to return", True, (150, 150, 150))
+            "Press any key to return to menu", True, (150, 150, 150))
         screen.blit(footer, footer.get_rect(
             center=(width // 2, height - 50)))
 
@@ -115,7 +115,7 @@ class Leaderboard:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     return "QUIT"
-                elif event.type == pg.KEYDOWN and event.key in (pg.K_ESCAPE, pg.K_RETURN, pg.K_SPACE):
+                elif event.type == pg.KEYDOWN:
                     return "BACK"
 
             clock.tick(60)
@@ -125,14 +125,96 @@ class NameInput:
     def __init__(self, record: HighscoreRecord) -> None:
         self.record = record
         self.font_title = pg.font.Font(None, 48)
+        self.font_text = pg.font.Font(None, 40)
         self.font_entry = pg.font.Font(None, 36)
         self.font_footer = pg.font.Font(None, 24)
 
-    def get_name(self) -> str:
+    def score_saved(self,
+                    screen: pg.Surface,
+                    clock: pg.time.Clock) -> str:
         width, height = screen.get_size()
-        input = True
 
-        while input
+        screen.fill((5, 0, 25))
+        title_surf = self.font_title.render(
+            "NEW SCORE SAVED!", True, (255, 255, 0))
+        screen.blit(title_surf, title_surf.get_rect(
+            center=(width // 2, height // 2 - 60)))
+        text_surf = self.font_title.render(
+            "DID YOU MAKE IT TO THE TOP 10?", True, (255, 255, 0))
+        screen.blit(text_surf, text_surf.get_rect(
+            center=(width // 2, height // 2 + 20)))
+        footer = self.font_footer.render(
+            "Press any key to proceed...", True, (150, 150, 150))
+        screen.blit(footer, footer.get_rect(
+            center=(width // 2, height - 50)))
+
+        pg.display.flip()
+
+        while True:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    return "QUIT"
+                elif event.type == pg.KEYDOWN:
+                    return "BACK"
+            clock.tick(60)
+
+    def get_name(self,
+                 screen: pg.Surface,
+                 clock: pg.time.Clock,
+                 score: int = 0) -> str:
+        width, height = screen.get_size()
+        name = ""
+
+        while True:
+            screen.fill((5, 0, 25))
+            title_surf = self.font_title.render(
+                "ENTER YOUR NAME", True, (255, 255, 0))
+            screen.blit(title_surf, title_surf.get_rect(
+                center=(width // 2, 80)))
+
+            text_surf = self.font_text.render(
+                "(letters and numbers only, max 10 characters)",
+                True, (255, 255, 0))
+            screen.blit(text_surf, text_surf.get_rect(
+                center=(width // 2, 120)))
+
+            score_surf = self.font_entry.render(
+                f"Score: {score}", True, (200, 200, 200))
+            screen.blit(score_surf, score_surf.get_rect(
+                center=(width // 2, 200)))
+
+            name_surf = self.font_entry.render(
+                name + "_", True, (255, 255, 255))
+            screen.blit(name_surf, name_surf.get_rect(
+                center=(width // 2, 300)))
+
+            footer = self.font_footer.render(
+                "Press ENTER to save, ESC to quit without saving your score",
+                True, (150, 150, 150))
+            screen.blit(footer, footer.get_rect(
+                center=(width // 2, height - 50)))
+            pg.display.flip()
+
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    return "QUIT"
+                elif event.type == pg.KEYDOWN:
+                    if event.key == pg.K_ESCAPE:
+                        return "BACK"
+                    elif event.key == pg.K_RETURN:
+                        if self.record._name_is_valid(name):
+                            self.record.add_score(name, score)
+                            self.record.save_to_file()
+                            self.score_saved(screen, clock)
+                            return "SUBMIT"
+                    elif event.key == pg.K_BACKSPACE:
+                        name = name[:-1]
+                    else:
+                        if len(name) < 10 and (
+                                event.unicode.isalnum() or
+                                event.unicode == " "):
+                            name += event.unicode
+            clock.tick(60)
 
 
 if __name__ == "__main__":
