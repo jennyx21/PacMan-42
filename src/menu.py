@@ -6,20 +6,36 @@ import pygame_menu.events
 class GameMenu:
     def __init__(
             self,
-            surface: pygame.Surface,
-            title: str = "Pac-Man"
+            surface: pygame.Surface
     ) -> None:
         self.surface = surface
         self.width, self.height = surface.get_size()
+
+        menutheme = pygame_menu.Theme(
+            background_color=(5, 0, 25),
+            widget_font_color=(200, 200, 200),
+            selection_color=(255, 255, 0),
+            widget_font_size=36,
+            widget_margin=(0, 25)
+        )
+        menutheme.title = False
+
         self.menu = pygame_menu.Menu(
-            title=title,
             width=self.width,
-            height=self.height
+            height=self.height,
+            title="PAC-MAN",
+            theme=menutheme
         )
         self.build_menu()
         self.action = None
 
     def build_menu(self) -> None:
+        self.menu.add.label(
+            "PAC-MAN",
+            font_color=(255, 255, 0),
+            font_size=64,
+            margin=(0, 40),
+        )
         self.menu.add.button('Play', self.play_function)
         self.menu.add.button('Highscores', self.show_highscores)
         self.menu.add.button('Quit', self.quit_function)
