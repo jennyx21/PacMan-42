@@ -8,6 +8,10 @@ This directory tracks task breakdown, development phases, and planned vs. actual
     ├── README.md                  # Index of project management
     └── timeline.md                # Tracking planned vs. actual progress
 
+## Tools & Tracking
+
+We use a shared [Trello Board](https://trello.com/b/Z480iQSZ/to-dos) for managing sprint to-dos, task assignments, and active progress tracking alongside this documentation
+
 ## Team Responsibilities
 
 - **Weng**: 

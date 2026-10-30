@@ -1,5 +1,7 @@
 ## Timeline
 
+For progress tracking and task cards, refer to our [Trello Board](https://trello.com/b/Z480iQSZ/to-dos).
+
 ### Week 1:
 - **Project Setup and documentation (Weng):** Makefile, pyproject.toml, package dependencies and project management tracking README.md, project_management/
 - **Configuration & Maze Loading (Weng):** `ConfigParser` (src/parser.py) with validation/defaults, `MazeLoader` (src/maze_loader.py) integrating the external mazegenerator wheel
