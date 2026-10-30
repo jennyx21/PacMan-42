@@ -46,21 +46,22 @@ class HighscoreRecord:
         except (FileNotFoundError, json.JSONDecodeError):
             self.scores = []
         except Exception as e:
+            self.scores = []
             print(e)
             print("Failed to load the leaderboard :(")
 
     def add_score(self, name: str, score: int) -> None:
         max_scores = 10
         if not self._name_is_valid(name):
-            print("Name cannot be empty or longer than 10 characters :(")
+            # print("Name cannot be empty or longer than 10 characters :(")
             return
         if not self._score_is_valid(score):
-            print("Score can only be positive integers :(")
+            # print("Score can only be positive integers :(")
             return
         self.scores.append({"name": name, "score": score})
         self.scores.sort(key=lambda x: x.get("score", 0), reverse=True)
         self.scores = self.scores[:max_scores]
-        print("Your score is saved :)")
+        # print("Your score is saved :)")
 
     def save_to_file(self) -> None:
         try:
@@ -164,29 +165,35 @@ class NameInput:
                  score: int = 0) -> str:
         width, height = screen.get_size()
         name = ""
+        msg = ""
 
         while True:
             screen.fill((5, 0, 25))
             title_surf = self.font_title.render(
                 "ENTER YOUR NAME", True, (255, 255, 0))
             screen.blit(title_surf, title_surf.get_rect(
-                center=(width // 2, 80)))
+                center=(width // 2, height // 2 - 180)))
 
             text_surf = self.font_text.render(
-                "(letters and numbers only, max 10 characters)",
-                True, (255, 255, 0))
+                "(max 10 characters)", True, (255, 255, 0))
             screen.blit(text_surf, text_surf.get_rect(
-                center=(width // 2, 120)))
+                center=(width // 2, height // 2 + 100)))
 
             score_surf = self.font_entry.render(
                 f"Score: {score}", True, (200, 200, 200))
             screen.blit(score_surf, score_surf.get_rect(
-                center=(width // 2, 200)))
+                center=(width // 2, height // 2 - 100)))
 
             name_surf = self.font_entry.render(
                 name + "_", True, (255, 255, 255))
             screen.blit(name_surf, name_surf.get_rect(
-                center=(width // 2, 300)))
+                center=(width // 2, height // 2)))
+
+            if msg:
+                msg_surf = self.font_footer.render(
+                    msg, True, (255, 0, 0))
+                screen.blit(msg_surf, msg_surf.get_rect(
+                    center=(width // 2, height // 2 + 140)))
 
             footer = self.font_footer.render(
                 "Press ENTER to save, ESC to quit without saving your score",
@@ -202,7 +209,9 @@ class NameInput:
                     if event.key == pg.K_ESCAPE:
                         return "BACK"
                     elif event.key == pg.K_RETURN:
-                        if self.record._name_is_valid(name):
+                        if not self.record._name_is_valid(name):
+                            msg = "Name cannot be empty :("
+                        else:
                             self.record.add_score(name, score)
                             self.record.save_to_file()
                             self.score_saved(screen, clock)
@@ -210,7 +219,9 @@ class NameInput:
                     elif event.key == pg.K_BACKSPACE:
                         name = name[:-1]
                     else:
-                        if len(name) < 10 and (
+                        if not name.isalnum():
+                            msg = "Enter only letters, numbers, and spaces :("
+                        elif len(name) < 10 and (
                                 event.unicode.isalnum() or
                                 event.unicode == " "):
                             name += event.unicode

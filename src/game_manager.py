@@ -67,7 +67,8 @@ class GameManager:
         # run game loop on self.screen
         # when game ends (death / win):
         # self.current_score = final_score
-        # self.state = GameState.NAME_INPUT
+        self.state = GameState.NAME_INPUT
+        # pass
 
     def _handle_name_input(self) -> None:
         action = self.name_input.get_name(
