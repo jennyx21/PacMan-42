@@ -17,12 +17,14 @@ class PacMan(pg.sprite.Sprite, Game):
                  game: Game,
                  maze: list[list[int]],
                  cell_size: float,
-                 start_cell: tuple[int, int]):
+                 start_cell: tuple[int, int], 
+                 lives: int):
         super().__init__()
         self.screen = screen
         self.game = game
         self.maze = maze
         self.cell_size = cell_size
+        self.lives = lives
         self.sprite_right = asset_loader("Pac-Man", "right")
         self.sprite_down = asset_loader("Pac-Man", "down")
         self.sprite_left = asset_loader("Pac-Man", "left")

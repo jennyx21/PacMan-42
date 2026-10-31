@@ -72,7 +72,7 @@ class Ghosts(pg.sprite.Sprite):
         inky.fill("blue")
         clyde = pg.Surface((10, 10))
         clyde.fill("orange")
-        location_col, location_col = self.find_target()
+        location_col, location_row = self.find_target()
         self.screen.blit(blinky, self.blink_start)
         self.screen.blit(pinky, self.pinky_start)
         self.screen.blit(inky, self.inky_start)

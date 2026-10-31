@@ -11,12 +11,14 @@ class DrawMaze:
                  pacgum: int,
                  superpacgum: int,
                  points_pg: int,
-                 points_spg: int):
+                 points_spg: int,
+                 lives: int):
         self.maze = maze
         self.pacgum = pacgum
         self.superpacgum = superpacgum
         self.points_pacgum = points_pg
         self.points_super_pacgum = points_spg
+        self.lives = lives
 
     def window(self):
         pg.init()
@@ -32,7 +34,8 @@ class DrawMaze:
                         game,
                         self.maze,
                         cell_size,
-                        (int(middle), int(middle)))
+                        (int(middle), int(middle)), 
+                        self.lives)
         pacgum = Pacgum(screen,
                         self.pacgum,
                         self.superpacgum,

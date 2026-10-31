@@ -41,7 +41,8 @@ def run() -> None:
                               config.pacgum,
                               4,
                               config.points_per_pacgum,
-                              config.points_per_super_pacgum)
+                              config.points_per_super_pacgum,
+                              config.lives)
         visualizer.window()
     except MazeLoaderError as e:
         print("MazeLoaderError:", e)
