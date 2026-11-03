@@ -25,10 +25,11 @@ class PacMan(pg.sprite.Sprite, Game):
         self.maze = maze
         self.cell_size = cell_size
         self.lives = lives
-        self.sprite_right = asset_loader("Pac-Man", "right")
-        self.sprite_down = asset_loader("Pac-Man", "down")
-        self.sprite_left = asset_loader("Pac-Man", "left")
-        self.sprite_up = asset_loader("Pac-Man", "up")
+
+        self.sprite_right = asset_loader("Pac-Man", "right", len(self.maze))
+        self.sprite_down = asset_loader("Pac-Man", "down", len(self.maze))
+        self.sprite_left = asset_loader("Pac-Man", "left", len(self.maze))
+        self.sprite_up = asset_loader("Pac-Man", "up", len(self.maze))
 
         self.current_sprite = self.sprite_right
         self.current = 0
@@ -92,7 +93,7 @@ class PacMan(pg.sprite.Sprite, Game):
         return 0
 
     def draw_pacman(self, x: int, y: int):
-        speed = 1.2
+        speed = 1.2 + 10 / len(self.maze)
         col, row = self.current_cell()
         start, pause = self.game.game_info()
         if start is False:
