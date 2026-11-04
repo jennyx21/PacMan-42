@@ -44,11 +44,11 @@ class DrawMaze:
                         self.maze,
                         cell_size,
                         pacman)
-        ghosts = Ghosts(screen,
-                        self.maze,
-                        cell_size,
-                        pacman,
-                        game)
+        # ghosts = Ghosts(screen,
+        #                 self.maze,
+        #                 cell_size,
+        #                 pacman,
+        #                 game)
         blinky = Blinky(screen, cell_size, self.maze, pacman, game)
         running = True
 
@@ -75,7 +75,7 @@ class DrawMaze:
                                int(middle * cell_size))
             pacgum.draw_pacgum()
             blinky.run_blinky()
-            ghosts.draw_ghosts()
+            # ghosts.draw_ghosts()
 
             pg.display.flip()
             clock.tick(60)

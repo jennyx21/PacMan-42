@@ -43,28 +43,69 @@ class Ghosts(pg.sprite.Sprite):
         return ((col + 0.5) * self.cell_size), (row + 0.5) * self.cell_size
 
     def current_cell(self, x: int, y: int) -> tuple[int, int]:
-        return int(self.x // self.cell_size), int(self.y // self.cell_size)
+        return int(x // self.cell_size), int(y // self.cell_size)
 
     def find_target(self, x: int, y: int):
         t_col, t_row = self.pacman.current_cell()
         return t_col, t_row
 
     
-    def distance_to_center(self, x: int, y: int):
-        col, row = self.current_cell()
+    def distance_to_center(self, x: int, y: int, direction: int) -> float:
+        col, row = self.current_cell(x, y)
         center_x, center_y = self.cell_center(col, row)
         if self.direction == UP:
-            return self.y - center_y
+            return y - center_y
         if self.direction == DOWN:
-            return center_y - self.y
+            return center_y - y
         if self.direction == LEFT:
-            return self.x - center_x
+            return x - center_x
         if self.direction == RIGHT:
-            return center_x - self.x
+            return center_x - x
         return 0
 
-    # def pathfind(self, col: int, row: int):
+    def pathfind(self, start: tuple[int, int], goal: tuple[int, int]) -> list[tuple[int, int]]:
+        # bfs algorithm to find the shortest path to the target cell
+        queue = [start]
+        came_from: dict[tuple[int, int], tuple[int, int] | None] = {start: None}
+        i = 0 
+        path = []
+        while i < len(queue):
+            current = queue[i]
+            i += 1
+            if current == goal:
+                while current is not None:
+                    queue.append(current)
+                    current = came_from[current]
+                return queue
+            neighbors = self.neighbors(current[1], current[0])  
+            for direction in neighbors:
+                if direction == UP:
+                    next = (current[0], current[1] - 1)
+                elif direction == RIGHT:
+                    next = (current[0] + 1, current[1])
+                elif direction == DOWN:
+                    next = (current[0], current[1] + 1)
+                elif direction == LEFT:
+                    next = (current[0] - 1, current[1])
+                else:
+                    continue
+                if next not in came_from:
+                    i
+                    queue.append(next)
+                    came_from[next] = current
+        return []
 
+    def neighbors(self, row: int, col: int) -> list[int]:
+        neighbors = []
+        if self.maze[row][col] & 1 == 0:
+            neighbors.append(UP)
+        if self.maze[row][col] & 2 == 0:
+            neighbors.append(RIGHT)
+        if self.maze[row][col] & 4 == 0:
+            neighbors.append(DOWN)
+        if self.maze[row][col] & 8 == 0:
+            neighbors.append(LEFT)
+        return neighbors
 
 
     def draw_ghosts(self):
@@ -102,7 +143,11 @@ class Blinky(Ghosts):
 
     def run_blinky(self):
         self.find_target(self.x, self.y)
+        self.current_cell(self.x, self.y)
         
+        path = self.pathfind(self.current_cell(self.x, self.y), self.find_target(self.x, self.y))
+        print(path)
+
         blinky = pg.Surface((10, 10))
         blinky.fill("red")
         self.screen.blit(blinky, self.blink_start)
