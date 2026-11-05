@@ -3,6 +3,7 @@ from src.pacman import PacMan
 from src.pacgum import Pacgum
 from pygame import Surface
 import pygame as pg
+import time
 
 
 UP = 1
@@ -25,7 +26,6 @@ class Ghosts(pg.sprite.Sprite):
         self.cell_size = cell_size
         self.pacman = pacman
         self.game = game
-        self.edible = False
         self.pinky_start = (self.cell_size / 2,
                             (len(self.maze) * self.cell_size) -
                             (self.cell_size / 2))
@@ -49,15 +49,14 @@ class Ghosts(pg.sprite.Sprite):
 
     def distance_to_center(self, x: int, y: int, direction: int) -> float:
         col, row = self.current_cell(x, y)
-        print("current", self.current_cell(x, y))
         center_x, center_y = self.cell_center(col, row)
-        if self.direction == UP:
+        if direction == UP:
             return y - center_y
-        if self.direction == DOWN:
+        if direction == DOWN:
             return center_y - y
-        if self.direction == LEFT:
+        if direction == LEFT:
             return x - center_x
-        if self.direction == RIGHT:
+        if direction == RIGHT:
             return center_x - x
         return 0
 
@@ -153,6 +152,11 @@ class Ghosts(pg.sprite.Sprite):
         self.screen.blit(inky, self.inky_start)
         self.screen.blit(clyde, self.clyde_start)
 
+    def _detect_coaliton(self, rect):
+        if rect.colliderect(self.pacman):
+            return True
+        return False
+
 
 class Blinky(Ghosts):
     def __init__(self,
@@ -170,19 +174,63 @@ class Blinky(Ghosts):
         self.y = self.cell_size / 2
         self.blink_start = (self.x, self.y)
         self.direction = 0
+        self.speed = 1.2 + 10 / len(self.maze)
+        self.path: list = None
+        self.edible = True
 
-    def run_blinky(self):
-        speed = 1.2 + 10 / len(self.maze)
-        print(self.distance_to_center(self.x, self.y, self.direction))
-        print(self.x, self.y)
-        if 0 <= self.distance_to_center(self.x, self.y, self.direction) < speed:
+    def move(self):
+        if 0 <= self.distance_to_center(self.x, self.y, self.direction) < self.speed:
             self.find_target()
-            path = self.pathfind(self.current_cell(self.y, self.x),
+            path = self.pathfind(self.current_cell(self.x, self.y),
                                  self.find_target())
             path = self.convert_path_direction(path)
-        if path:
-            self.x, self.y = self.walk_path(self.x, self.y, path[0], speed)
+            self.path = path
+            self.direction = path[0]
+        if self.path:
+            self.x, self.y = self.walk_path(self.x, self.y, self.direction, self.speed)
 
+    def run(self):
+        target_col, target_row = self.find_target()
+        col, row = self.current_cell(self.x, self.y)
+        dest_col = col
+        dest_row = row
+        if target_row <= row:
+            if len(self.maze) > target_row:
+                dest_row = row + 1
+            else:
+                dest_row = row - 1
+        elif target_row >= row:
+            if len(self.maze) < target_row:
+                dest_row = row - 1
+            else:
+                dest_row = row + 1
+        if target_col <= col:
+            if len(self.maze[0]) > target_row:
+                dest_col = col + 1
+            else:
+                dest_col = col - 1
+        elif target_col >= col:
+            if len(self.maze[0]) < target_row:
+                dest_col = col - 1
+            else:
+                dest_col = col + 1
+        if 0 <= self.distance_to_center(self.x, self.y, self.direction) < self.speed:
+            path = self.pathfind((col, row),
+                                 (dest_col, dest_row))
+            path = self.convert_path_direction(path)
+            self.path = path
+            print("Path", path)
+            self.direction = self.path[0]
+        if self.path:
+            self.x, self.y = self.walk_path(self.x, self.y, self.direction, self.speed)
+
+    def run_blinky(self):
         blinky = pg.Surface((10, 10))
+        if not self.edible:
+            self.move()
+        else:
+            self.run()
+
+        rect = blinky.get_rect(center=(self.x, self.y))
         blinky.fill("red")
-        self.screen.blit(blinky, (self.x, self.y))
+        self.screen.blit(blinky, rect)
