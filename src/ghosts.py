@@ -157,6 +157,9 @@ class Ghosts(pg.sprite.Sprite):
             return True
         return False
 
+    # def flee_direction(self, col: int, row: int):
+
+
 
 class Blinky(Ghosts):
     def __init__(self,
@@ -181,6 +184,7 @@ class Blinky(Ghosts):
     def move(self):
         if 0 <= self.distance_to_center(self.x, self.y, self.direction) < self.speed:
             self.find_target()
+            self.x, self.y = self.cell_center(self.current_cell(self.x, self.y))
             path = self.pathfind(self.current_cell(self.x, self.y),
                                  self.find_target())
             path = self.convert_path_direction(path)
@@ -215,12 +219,8 @@ class Blinky(Ghosts):
             else:
                 dest_col = col + 1
         if 0 <= self.distance_to_center(self.x, self.y, self.direction) < self.speed:
-            path = self.pathfind((col, row),
-                                 (dest_col, dest_row))
-            path = self.convert_path_direction(path)
-            self.path = path
-            print("Path", path)
-            self.direction = self.path[0]
+            self.x, self.y = self.cell_center(self.current_cell(self.x, self.y))
+
         if self.path:
             self.x, self.y = self.walk_path(self.x, self.y, self.direction, self.speed)
 

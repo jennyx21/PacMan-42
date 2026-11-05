@@ -34,7 +34,6 @@ class Pacgum(pg.sprite.Sprite):
         return {((x + 0.5) * self.cell_size, (y + 0.5) * self.cell_size)
                 for x, y in chosen}
 
-
     def _detect_coaliton(self, rect):
         if rect.colliderect(self.pacman):
             return True
