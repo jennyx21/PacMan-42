@@ -72,7 +72,7 @@ class DrawMaze:
 
             pacman.draw_pacman(int(middle * cell_size),
                                int(middle * cell_size))
-            pacgum.draw_pacgum()
+            pacgum.run_gums()
             blinky.run_blinky()
             pinky.run_pinky()
             inky.run_inky()

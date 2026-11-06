@@ -26,7 +26,9 @@ class Pacgum(pg.sprite.Sprite):
         self.cell_size = cell_size
         self.pacman = pacman
         self.game = game
-        self.distrinuted_pacgum = self._distribute()
+        self.timer = 0
+        self.distributed_pacgum = self._distribute()
+        self.distribute_superpacgum = self._distribute_super()
 
     def _distribute(self):
         cells = [(x, y)
@@ -37,6 +39,18 @@ class Pacgum(pg.sprite.Sprite):
         return {((x + 0.5) * self.cell_size, (y + 0.5) * self.cell_size)
                 for x, y in chosen}
 
+    def _distribute_super(self):
+        cell = []
+        cell.append((0.5 * self.cell_size, 0.5 * self.cell_size))
+        cell.append((len(self.maze) * self.cell_size - 0.5 * self.cell_size,
+                    0.5 * self.cell_size))
+        cell.append((len(self.maze) * self.cell_size - 0.5 * self.cell_size,
+                     len(self.maze) * self.cell_size - 0.5 * self.cell_size))
+        cell.append((0.5 * self.cell_size,
+                    len(self.maze) * self.cell_size - 0.5 * self.cell_size))
+        print(cell)
+        return cell
+
     def _detect_coaliton(self, rect):
         if rect.colliderect(self.pacman):
             return True
@@ -45,10 +59,10 @@ class Pacgum(pg.sprite.Sprite):
     def draw_pacgum(self):
         gum = pg.Surface((5, 5))
         gum_list = []
-        for e in list(self.distrinuted_pacgum):
+        for e in list(self.distributed_pacgum):
             rect = gum.get_rect(center=e)
             if self._detect_coaliton(rect):
-                self.distrinuted_pacgum.remove(e)
+                self.distributed_pacgum.remove(e)
                 self.game.add_points(self.points_pacgum)
             else:
                 gum.fill((255, 255, 255))
@@ -57,7 +71,34 @@ class Pacgum(pg.sprite.Sprite):
             g, r = i
             self.screen.blit(g, r)
 
-    def draw_superpacgum():
+    def signal_return(self):
+        current_tic = pg.time.get_ticks()
+        if current_tic > self.timer:
+            self.game.reset_signal()
+        return
+
+    def draw_superpacgum(self):
+        supergum = pg.Surface((10, 10))
+        super_gum_list = []
+        if self.game.signal:
+            self.signal_return()
+        for e in self.distribute_superpacgum:
+            super_rect = supergum.get_rect(center=e)
+            if self._detect_coaliton(super_rect):
+                self.game.give_signal()
+                time = pg.time.get_ticks()
+                self.timer = time + 20000
+                self.game.add_points(self.points_superpacgum)
+                self.distribute_superpacgum.remove(e)
+            else:
+                supergum.fill("white")
+                super_gum_list.append((supergum, super_rect))
+        for i in super_gum_list:
+            g, r = i
+            self.screen.blit(g, r)
 
 
+    def run_gums(self):
+        self.draw_pacgum()
+        self.draw_superpacgum()
 

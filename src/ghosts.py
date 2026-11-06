@@ -198,13 +198,18 @@ class Blinky(Ghosts):
 
     def run_blinky(self):
         blinky = pg.Surface((10, 10))
+        if self.game.signal:
+            self.edible = True
+        else: 
+            self.edible = False
         if not self.edible:
             self.move()
+            blinky.fill("red")
         else:
             self.run()
+            blinky.fill("gray")
 
         rect = blinky.get_rect(center=(self.x, self.y))
-        blinky.fill("red")
         self.screen.blit(blinky, rect)
 
 
@@ -251,13 +256,18 @@ class Pinky(Ghosts):
 
     def run_pinky(self):
         pinky = pg.Surface((10, 10))
+        if self.game.signal:
+            self.edible = True
+        else: 
+            self.edible = False
         if not self.edible:
             self.move()
+            pinky.fill("pink")
         else:
             self.run()
+            pinky.fill("gray")
 
         rect = pinky.get_rect(center=(self.x, self.y))
-        pinky.fill("pink")
         self.screen.blit(pinky, rect)
 
 
@@ -304,13 +314,18 @@ class Inky(Ghosts):
 
     def run_inky(self):
         inky = pg.Surface((10, 10))
+        if self.game.signal:
+            self.edible = True
+        else: 
+            self.edible = False
         if not self.edible:
             self.move()
+            inky.fill("blue")
         else:
             self.run()
+            inky.fill("gray")
 
         rect = inky.get_rect(center=(self.x, self.y))
-        inky.fill("blue")
         self.screen.blit(inky, rect)
 
 
@@ -357,11 +372,16 @@ class Clyde(Ghosts):
 
     def run_clyde(self):
         clyde = pg.Surface((10, 10))
+        if self.game.signal:
+            self.edible = True
+        else: 
+            self.edible = False
         if not self.edible:
             self.move()
+            clyde.fill("orange")
         else:
             self.run()
+            clyde.fill("gray")
 
         rect = clyde.get_rect(center=(self.x, self.y))
-        clyde.fill("orange")
         self.screen.blit(clyde, rect)
