@@ -2,6 +2,7 @@ from pygame import Surface
 import pygame as pg
 import random
 from src.pacman import PacMan
+from src.player_mechanics import Game
 
 
 class Pacgum(pg.sprite.Sprite):
@@ -13,7 +14,8 @@ class Pacgum(pg.sprite.Sprite):
                  points_spg: int,
                  maze: list[list[int]],
                  cell_size: int,
-                 pacman: PacMan):
+                 pacman: PacMan,
+                 game: Game):
         super().__init__()
         self.screen = screen
         self.number_pacgum = number_pg
@@ -23,6 +25,7 @@ class Pacgum(pg.sprite.Sprite):
         self.maze = maze
         self.cell_size = cell_size
         self.pacman = pacman
+        self.game = game
         self.distrinuted_pacgum = self._distribute()
 
     def _distribute(self):
@@ -46,9 +49,15 @@ class Pacgum(pg.sprite.Sprite):
             rect = gum.get_rect(center=e)
             if self._detect_coaliton(rect):
                 self.distrinuted_pacgum.remove(e)
+                self.game.add_points(self.points_pacgum)
             else:
                 gum.fill((255, 255, 255))
                 gum_list.append((gum, rect))
         for i in gum_list:
             g, r = i
             self.screen.blit(g, r)
+
+    def draw_superpacgum():
+
+
+

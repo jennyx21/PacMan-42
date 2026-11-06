@@ -3,7 +3,7 @@ from pygame import Surface
 from src.player_mechanics import Game
 from src.pacman import PacMan
 from src.pacgum import Pacgum
-from src.ghosts import Ghosts, Blinky
+from src.ghosts import Blinky, Pinky, Inky, Clyde
 
 
 class DrawMaze:
@@ -43,13 +43,12 @@ class DrawMaze:
                         self.points_super_pacgum,
                         self.maze,
                         cell_size,
-                        pacman)
-        # ghosts = Ghosts(screen,
-        #                 self.maze,
-        #                 cell_size,
-        #                 pacman,
-        #                 game)
+                        pacman, 
+                        game)
         blinky = Blinky(screen, cell_size, self.maze, pacman, game)
+        pinky = Pinky(screen, cell_size, self.maze, pacman, game)
+        inky = Inky(screen, cell_size, self.maze, pacman, game)
+        clyde = Clyde(screen, cell_size, self.maze, pacman, game)
         running = True
 
         while running:
@@ -75,7 +74,9 @@ class DrawMaze:
                                int(middle * cell_size))
             pacgum.draw_pacgum()
             blinky.run_blinky()
-            # ghosts.draw_ghosts()
+            pinky.run_pinky()
+            inky.run_inky()
+            clyde.run_clyde()
 
             pg.display.flip()
             clock.tick(60)

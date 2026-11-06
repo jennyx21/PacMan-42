@@ -5,6 +5,10 @@ class Game():
     def __init__(self):
         self.start = False
         self.pause = False
+        self.highscore = 0 
+
+    def add_points(self, points: int):
+        self.highscore += points
 
     def game_info(self) -> tuple[bool, bool]:
         return self.start, self.pause
@@ -17,3 +21,9 @@ class Game():
         elif self.start is True and self.pause is True:
             self.pause = False
         time.sleep(0.2)
+
+    def update_edibility(self, edible_state: bool):
+        if edible_state == False:
+            return True
+        else: 
+            return False

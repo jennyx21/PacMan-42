@@ -26,16 +26,6 @@ class Ghosts(pg.sprite.Sprite):
         self.cell_size = cell_size
         self.pacman = pacman
         self.game = game
-        self.pinky_start = (self.cell_size / 2,
-                            (len(self.maze) * self.cell_size) -
-                            (self.cell_size / 2))
-        self.inky_start = ((len(self.maze) * self.cell_size) -
-                           (self.cell_size / 2), 0 + self.cell_size / 2)
-        self.clyde_start = ((len(self.maze) * self.cell_size) -
-                            (self.cell_size / 2),
-                            (len(self.maze) * self.cell_size) -
-                            (self.cell_size / 2))
-        # self.blinky = Blinky(screen, cell_size, maze, pacman, game)
 
     def cell_center(self, col: int, row: int) -> tuple[float, float]:
         return ((col + 0.5) * self.cell_size), (row + 0.5) * self.cell_size
@@ -137,19 +127,8 @@ class Ghosts(pg.sprite.Sprite):
         return neighbors
 
     def draw_ghosts(self):
-        # self.blinky.run_blinky()
-        pinky = pg.Surface((10, 10))
-        pinky.fill("pink")
-        inky = pg.Surface((10, 10))
-        inky.fill("blue")
         clyde = pg.Surface((10, 10))
         clyde.fill("orange")
-        # location_col, location_row = self.find_target()
-
-        # self.pathfind(location_col, location_row)
-
-        self.screen.blit(pinky, self.pinky_start)
-        self.screen.blit(inky, self.inky_start)
         self.screen.blit(clyde, self.clyde_start)
 
     def _detect_coaliton(self, rect):
@@ -157,8 +136,23 @@ class Ghosts(pg.sprite.Sprite):
             return True
         return False
 
-    # def flee_direction(self, col: int, row: int):
-
+    def flee_direction(self, col: int, row: int, old_direction: int):
+        t_col, t_row = self.find_target()
+        neightbors = self.neighbors(row, col)
+        if len(neightbors) == 1:
+            return neightbors[0]
+        if OPPOSITE[old_direction] in neightbors:
+            neightbors.remove(OPPOSITE[old_direction])
+        d_col = RIGHT if col >= t_col else LEFT
+        d_row = DOWN if row >= t_row else UP
+        if abs(row - t_row) >= abs(col - t_col):
+            order = [d_row, d_col, OPPOSITE[d_row], OPPOSITE[d_col]]
+        else:
+            order = [d_col, d_row, OPPOSITE[d_col], OPPOSITE[d_row]]
+        for d in order:
+            if d in neightbors:
+                return d
+        return 0
 
 
 class Blinky(Ghosts):
@@ -175,16 +169,17 @@ class Blinky(Ghosts):
                          game)
         self.x = self.cell_size / 2
         self.y = self.cell_size / 2
-        self.blink_start = (self.x, self.y)
+        self.blinky_start = (self.x, self.y)
         self.direction = 0
         self.speed = 1.2 + 10 / len(self.maze)
         self.path: list = None
-        self.edible = True
+        self.edible = False
 
     def move(self):
         if 0 <= self.distance_to_center(self.x, self.y, self.direction) < self.speed:
             self.find_target()
-            self.x, self.y = self.cell_center(self.current_cell(self.x, self.y))
+            col, row = self.current_cell(self.x, self.y)
+            self.x, self.y = self.cell_center(col, row)
             path = self.pathfind(self.current_cell(self.x, self.y),
                                  self.find_target())
             path = self.convert_path_direction(path)
@@ -194,34 +189,11 @@ class Blinky(Ghosts):
             self.x, self.y = self.walk_path(self.x, self.y, self.direction, self.speed)
 
     def run(self):
-        target_col, target_row = self.find_target()
-        col, row = self.current_cell(self.x, self.y)
-        dest_col = col
-        dest_row = row
-        if target_row <= row:
-            if len(self.maze) > target_row:
-                dest_row = row + 1
-            else:
-                dest_row = row - 1
-        elif target_row >= row:
-            if len(self.maze) < target_row:
-                dest_row = row - 1
-            else:
-                dest_row = row + 1
-        if target_col <= col:
-            if len(self.maze[0]) > target_row:
-                dest_col = col + 1
-            else:
-                dest_col = col - 1
-        elif target_col >= col:
-            if len(self.maze[0]) < target_row:
-                dest_col = col - 1
-            else:
-                dest_col = col + 1
         if 0 <= self.distance_to_center(self.x, self.y, self.direction) < self.speed:
-            self.x, self.y = self.cell_center(self.current_cell(self.x, self.y))
-
-        if self.path:
+            col, row = self.current_cell(self.x, self.y)
+            self.x, self.y = self.cell_center(col, row)
+            self.direction = self.flee_direction(col, row, self.direction)
+        if self.direction:
             self.x, self.y = self.walk_path(self.x, self.y, self.direction, self.speed)
 
     def run_blinky(self):
@@ -234,3 +206,162 @@ class Blinky(Ghosts):
         rect = blinky.get_rect(center=(self.x, self.y))
         blinky.fill("red")
         self.screen.blit(blinky, rect)
+
+
+class Pinky(Ghosts):
+    def __init__(self,
+                 surface: Surface,
+                 cell_size: int,
+                 maze: list[list[int]],
+                 pacman: PacMan,
+                 game: Game):
+        super().__init__(surface,
+                         maze,
+                         cell_size,
+                         pacman,
+                         game)
+        self.x = self.cell_size / 2
+        self.y = (len(self.maze) * self.cell_size) - (self.cell_size / 2)
+        self.pinky_start = (self.x, self.y)
+        self.direction = 0
+        self.speed = 1.2 + 10 / len(self.maze)
+        self.path: list = None
+        self.edible = False
+
+    def move(self):
+        if 0 <= self.distance_to_center(self.x, self.y, self.direction) < self.speed:
+            self.find_target()
+            col, row = self.current_cell(self.x, self.y)
+            self.x, self.y = self.cell_center(col, row)
+            path = self.pathfind(self.current_cell(self.x, self.y),
+                                 self.find_target())
+            path = self.convert_path_direction(path)
+            self.path = path
+            self.direction = path[0]
+        if self.path:
+            self.x, self.y = self.walk_path(self.x, self.y, self.direction, self.speed)
+
+    def run(self):
+        if 0 <= self.distance_to_center(self.x, self.y, self.direction) < self.speed:
+            col, row = self.current_cell(self.x, self.y)
+            self.x, self.y = self.cell_center(col, row)
+            self.direction = self.flee_direction(col, row, self.direction)
+        if self.direction:
+            self.x, self.y = self.walk_path(self.x, self.y, self.direction, self.speed)
+
+    def run_pinky(self):
+        pinky = pg.Surface((10, 10))
+        if not self.edible:
+            self.move()
+        else:
+            self.run()
+
+        rect = pinky.get_rect(center=(self.x, self.y))
+        pinky.fill("pink")
+        self.screen.blit(pinky, rect)
+
+
+class Inky(Ghosts):
+    def __init__(self,
+                 surface: Surface,
+                 cell_size: int,
+                 maze: list[list[int]],
+                 pacman: PacMan,
+                 game: Game):
+        super().__init__(surface,
+                         maze,
+                         cell_size,
+                         pacman,
+                         game)
+        self.x = (len(self.maze) * self.cell_size) -(self.cell_size / 2)
+        self.y = self.cell_size / 2
+        self.inky_start = (self.x, self.y)
+        self.direction = 0
+        self.speed = 1.2 + 10 / len(self.maze)
+        self.path: list = None
+        self.edible = False
+
+    def move(self):
+        if 0 <= self.distance_to_center(self.x, self.y, self.direction) < self.speed:
+            self.find_target()
+            col, row = self.current_cell(self.x, self.y)
+            self.x, self.y = self.cell_center(col, row)
+            path = self.pathfind(self.current_cell(self.x, self.y),
+                                 self.find_target())
+            path = self.convert_path_direction(path)
+            self.path = path
+            self.direction = path[0]
+        if self.path:
+            self.x, self.y = self.walk_path(self.x, self.y, self.direction, self.speed)
+
+    def run(self):
+        if 0 <= self.distance_to_center(self.x, self.y, self.direction) < self.speed:
+            col, row = self.current_cell(self.x, self.y)
+            self.x, self.y = self.cell_center(col, row)
+            self.direction = self.flee_direction(col, row, self.direction)
+        if self.direction:
+            self.x, self.y = self.walk_path(self.x, self.y, self.direction, self.speed)
+
+    def run_inky(self):
+        inky = pg.Surface((10, 10))
+        if not self.edible:
+            self.move()
+        else:
+            self.run()
+
+        rect = inky.get_rect(center=(self.x, self.y))
+        inky.fill("blue")
+        self.screen.blit(inky, rect)
+
+
+class Clyde(Ghosts):
+    def __init__(self,
+                 surface: Surface,
+                 cell_size: int,
+                 maze: list[list[int]],
+                 pacman: PacMan,
+                 game: Game):
+        super().__init__(surface,
+                         maze,
+                         cell_size,
+                         pacman,
+                         game)
+        self.x = (len(self.maze) * self.cell_size) - (self.cell_size / 2)
+        self.y = (len(self.maze) * self.cell_size) - (self.cell_size / 2)
+        self.clyde_start = (self.x, self.y)
+        self.direction = 0
+        self.speed = 1.2 + 10 / len(self.maze)
+        self.path: list = None
+        self.edible = False
+
+    def move(self):
+        if 0 <= self.distance_to_center(self.x, self.y, self.direction) < self.speed:
+            self.find_target()
+            col, row = self.current_cell(self.x, self.y)
+            self.x, self.y = self.cell_center(col, row)
+            path = self.pathfind(self.current_cell(self.x, self.y),
+                                 self.find_target())
+            path = self.convert_path_direction(path)
+            self.path = path
+            self.direction = path[0]
+        if self.path:
+            self.x, self.y = self.walk_path(self.x, self.y, self.direction, self.speed)
+
+    def run(self):
+        if 0 <= self.distance_to_center(self.x, self.y, self.direction) < self.speed:
+            col, row = self.current_cell(self.x, self.y)
+            self.x, self.y = self.cell_center(col, row)
+            self.direction = self.flee_direction(col, row, self.direction)
+        if self.direction:
+            self.x, self.y = self.walk_path(self.x, self.y, self.direction, self.speed)
+
+    def run_clyde(self):
+        clyde = pg.Surface((10, 10))
+        if not self.edible:
+            self.move()
+        else:
+            self.run()
+
+        rect = clyde.get_rect(center=(self.x, self.y))
+        clyde.fill("orange")
+        self.screen.blit(clyde, rect)
