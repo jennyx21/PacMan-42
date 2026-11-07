@@ -34,7 +34,7 @@ class DrawMaze:
                         game,
                         self.maze,
                         cell_size,
-                        (int(middle), int(middle)), 
+                        (int(middle), int(middle)),
                         self.lives)
         pacgum = Pacgum(screen,
                         self.pacgum,
@@ -43,7 +43,7 @@ class DrawMaze:
                         self.points_super_pacgum,
                         self.maze,
                         cell_size,
-                        pacman, 
+                        pacman,
                         game)
         blinky = Blinky(screen, cell_size, self.maze, pacman, game)
         pinky = Pinky(screen, cell_size, self.maze, pacman, game)
@@ -74,9 +74,9 @@ class DrawMaze:
                                int(middle * cell_size))
             pacgum.run_gums()
             blinky.run_blinky()
-            pinky.run_pinky()
-            inky.run_inky()
-            clyde.run_clyde()
+            # pinky.run_pinky()
+            # inky.run_inky()
+            # clyde.run_clyde()
 
             pg.display.flip()
             clock.tick(60)

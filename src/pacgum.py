@@ -48,7 +48,6 @@ class Pacgum(pg.sprite.Sprite):
                      len(self.maze) * self.cell_size - 0.5 * self.cell_size))
         cell.append((0.5 * self.cell_size,
                     len(self.maze) * self.cell_size - 0.5 * self.cell_size))
-        print(cell)
         return cell
 
     def _detect_coaliton(self, rect):
@@ -87,7 +86,7 @@ class Pacgum(pg.sprite.Sprite):
             if self._detect_coaliton(super_rect):
                 self.game.give_signal()
                 time = pg.time.get_ticks()
-                self.timer = time + 20000
+                self.timer = time + 20
                 self.game.add_points(self.points_superpacgum)
                 self.distribute_superpacgum.remove(e)
             else:

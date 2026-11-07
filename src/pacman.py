@@ -17,7 +17,7 @@ class PacMan(pg.sprite.Sprite, Game):
                  game: Game,
                  maze: list[list[int]],
                  cell_size: float,
-                 start_cell: tuple[int, int], 
+                 start_cell: tuple[int, int],
                  lives: int):
         super().__init__()
         self.screen = screen
@@ -33,6 +33,7 @@ class PacMan(pg.sprite.Sprite, Game):
 
         self.current_sprite = self.sprite_right
         self.current = 0
+        self.start_cell = start_cell
         self.col, self.row = start_cell
         self.old_col = 0
         self.old_row = 0
@@ -96,6 +97,11 @@ class PacMan(pg.sprite.Sprite, Game):
         speed = 1.2 + 10 / len(self.maze)
         col, row = self.current_cell()
         start, pause = self.game.game_info()
+        print(self.current_sprite)
+        print(self.sprite_right)
+        print(self.sprite_down)
+        print(self.sprite_up)
+        print(self.sprite_left)
         if start is False:
             self.image = self.current_sprite[0]
             self.rect = self.image.get_rect()
