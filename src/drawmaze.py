@@ -66,7 +66,7 @@ class DrawMaze:
                 elif start is True:
                     game.update_start()
 
-            screen.fill((5, 0, 25))
+            screen.fill((15, 10, 40))
             self.draw_walls(cell_size, screen, (100, 90, 175), 8, 3)
             self.draw_walls(cell_size, screen, (175, 170, 255), 3)
 
