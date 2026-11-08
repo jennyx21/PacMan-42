@@ -2,7 +2,9 @@ import pygame as pg
 from enum import Enum, auto
 from src.highscores import HighscoreRecord, Leaderboard, NameInput
 from src.menu import GameMenu
-# import DrawMaze
+from src.drawmaze import DrawMaze
+from src.maze_loader import MazeLoader, MazeLoaderError
+import sys
 # import GameLevel
 
 
@@ -66,6 +68,30 @@ class GameManager:
     def _handle_playing(self) -> None:
         # run game loop on self.screen
         # when game ends (death / win):
+        i = 0
+        score = 0
+        # while i < 9:
+        try:
+            level = self.config.levels[i]
+            maze_data = MazeLoader.load(
+                width=level.width,
+                height=level.height,
+                seed=self.config.seed,
+            )
+        except MazeLoaderError as e:
+            print("MazeLoaderError:", e)
+            sys.exit(1)
+        game_loop = DrawMaze(maze_data.grid,
+                                self.config.pacgum,
+                                4,
+                                self.config.points_per_pacgum,
+                                self.config.points_per_super_pacgum,
+                                self.config.lives,
+                                self.screen,
+
+                                score)
+        game_loop.window()
+            # i += 1
         # self.current_score = final_score
         self.state = GameState.NAME_INPUT
         # pass

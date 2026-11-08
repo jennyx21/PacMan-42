@@ -261,6 +261,7 @@ class Blinky(Ghosts):
                         self.time = pg.time.get_ticks() + self.edible_timer
 
                     if self._detect_coaliton_ghosts(rect):
+                        self.game.loose_lives()
                         row, col = self.pacman.start_cell
                         self.pacman.x, self.pacman.y = self.cell_center(row,
                                                                         col)
@@ -293,6 +294,8 @@ class Blinky(Ghosts):
                     if self._detect_coaliton(rect):
                         self.x, self.y = self.blinky_start
                         self.edible = False
+# hard codet Points of the ghost.. need to be changed
+                        self.game.add_points(200)
                     self.current += 0.2
         else:
             image = self.current_sprite[0]

@@ -6,37 +6,42 @@ from src.pacgum import Pacgum
 from src.ghosts import Blinky, Pinky, Inky, Clyde
 
 
+
 class DrawMaze:
     def __init__(self, maze: list[list[int]],
                  pacgum: int,
                  superpacgum: int,
                  points_pg: int,
                  points_spg: int,
-                 lives: int):
+                 lives: int,
+                 screen: Surface,
+                 score: int):
         self.maze = maze
         self.pacgum = pacgum
         self.superpacgum = superpacgum
         self.points_pacgum = points_pg
         self.points_super_pacgum = points_spg
         self.lives = lives
+        self.screen = screen
+        self.score = score
 
     def window(self):
         pg.init()
         clock = pg.time.Clock()
-        whidth: int = 800
-        height: int = 800
+        whidth: int = 700
+        height: int = 700
         cell_size = whidth / len(self.maze)
         middle = len(self.maze) / 2
-        screen = pg.display.set_mode((whidth, height))
-        pg.display.set_caption("Pac Man")
-        game = Game()
-        pacman = PacMan(screen,
+        background = pg.Surface((whidth + 2 * 50, height + 2 * 50))
+        field = pg.Surface((whidth, height))
+        game = Game(background, self.score, self.lives)
+        pacman = PacMan(field,
                         game,
                         self.maze,
                         cell_size,
                         (int(middle), int(middle)),
                         self.lives)
-        pacgum = Pacgum(screen,
+        pacgum = Pacgum(field,
                         self.pacgum,
                         self.superpacgum,
                         self.points_pacgum,
@@ -45,10 +50,10 @@ class DrawMaze:
                         cell_size,
                         pacman,
                         game)
-        blinky = Blinky(screen, cell_size, self.maze, pacman, game)
-        pinky = Pinky(screen, cell_size, self.maze, pacman, game)
-        inky = Inky(screen, cell_size, self.maze, pacman, game)
-        clyde = Clyde(screen, cell_size, self.maze, pacman, game)
+        blinky = Blinky(field, cell_size, self.maze, pacman, game)
+        pinky = Pinky(field, cell_size, self.maze, pacman, game)
+        inky = Inky(field, cell_size, self.maze, pacman, game)
+        clyde = Clyde(field, cell_size, self.maze, pacman, game)
         running = True
 
         while running:
@@ -66,21 +71,29 @@ class DrawMaze:
                 elif start is True:
                     game.update_start()
 
-            screen.fill((15, 10, 40))
-            self.draw_walls(cell_size, screen, (100, 90, 175), 8, 3)
-            self.draw_walls(cell_size, screen, (175, 170, 255), 3)
+            background.fill((15, 10, 40))
+            field.fill((15, 10, 40))
+            self.draw_walls(cell_size, field, (100, 90, 175), 8, 3)
+            self.draw_walls(cell_size, field, (175, 170, 255), 3)
 
             pacman.draw_pacman(int(middle * cell_size),
                                int(middle * cell_size))
             pacgum.run_gums()
             blinky.run_blinky()
+            game.display_highscore()
+            game.diplay_lives()
+            if game.lives_info() == 0:
+                running = False
+
             # pinky.run_pinky()
             # inky.run_inky()
             # clyde.run_clyde()
-
+            self.screen.blit(background, background.get_rect())
+            self.screen.blit(field,
+                             field.get_rect(center=self.screen.
+                                            get_rect().center))
             pg.display.flip()
             clock.tick(60)
-        pg.quit()
 
     def draw_walls(self,
                    cell_size: float,
