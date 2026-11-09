@@ -162,7 +162,10 @@ class Ghosts(pg.sprite.Sprite):
             x, y = self.cell_center(col, row)
             path = self.pathfind(self.current_cell(x, y), target)
             path = self.convert_path_direction(path)
-            self.direction = path[0]
+            if path:
+                self.direction = path[0]
+            else:
+                self.direction = 0
         if path:
             x, y = self.walk_path(x, y, direction, speed)
         return path, x, y
@@ -260,7 +263,7 @@ class Blinky(Ghosts):
                         self.checked = 1
                         self.time = pg.time.get_ticks() + self.edible_timer
 
-                    if self._detect_coaliton_ghosts(rect):
+                    if self._detect_coaliton_ghosts(rect) and not self.game.cheat:
                         self.game.loose_lives()
                         row, col = self.pacman.start_cell
                         self.pacman.x, self.pacman.y = self.cell_center(row,
@@ -291,12 +294,15 @@ class Blinky(Ghosts):
                                                               self.y,
                                                               self.direction,
                                                               self.speed)
-                    if self._detect_coaliton(rect):
+                    if self._detect_coaliton_ghosts(rect):
                         self.x, self.y = self.blinky_start
                         self.edible = False
 # hard codet Points of the ghost.. need to be changed
                         self.game.add_points(200)
                     self.current += 0.2
+            else:
+                image = self.current_sprite[0]
+                rect = image.get_rect(center=(self.x, self.y))
         else:
             image = self.current_sprite[0]
             rect = image.get_rect(center=(self.x, self.y))

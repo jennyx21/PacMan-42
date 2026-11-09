@@ -15,7 +15,8 @@ class DrawMaze:
                  points_spg: int,
                  lives: int,
                  screen: Surface,
-                 score: int):
+                 score: int,
+                 level: int):
         self.maze = maze
         self.pacgum = pacgum
         self.superpacgum = superpacgum
@@ -24,6 +25,7 @@ class DrawMaze:
         self.lives = lives
         self.screen = screen
         self.score = score
+        self.level = level
 
     def window(self):
         pg.init()
@@ -34,7 +36,7 @@ class DrawMaze:
         middle = len(self.maze) / 2
         background = pg.Surface((whidth + 2 * 50, height + 2 * 50))
         field = pg.Surface((whidth, height))
-        game = Game(background, self.score, self.lives)
+        game = Game(background, self.score, self.lives, self.level)
         pacman = PacMan(field,
                         game,
                         self.maze,
@@ -57,9 +59,13 @@ class DrawMaze:
         running = True
 
         while running:
-            for event in pg.event.get():
+            events = pg.event.get()
+            for event in events:
                 if event.type is pg.QUIT:
                     running = False
+                if event.type == pg.KEYDOWN:
+                    if event.key is pg.K_c:
+                        game.turn_on_cheat()
 
             start, pause = game.game_info()
             keys = pg.key.get_pressed()
@@ -82,6 +88,7 @@ class DrawMaze:
             blinky.run_blinky()
             game.display_highscore()
             game.diplay_lives()
+            game.display_Level()
             if game.lives_info() == 0:
                 running = False
 

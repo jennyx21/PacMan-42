@@ -5,15 +5,17 @@ from src.asset_helper import asset_loader
 
 
 class Game():
-    def __init__(self, screen: Surface, highscore: int, lives: int):
+    def __init__(self, screen: Surface, highscore: int, lives: int, level: int):
         self.start = False
         self.pause = False
         self.highscore = highscore
         self.signal = 0
         self.index = 0
+        self.cheat = False
         self.pacman_lives = lives
         self.live_list: list = self.rameining_lives()
         self.screen = screen
+        self.level = level
 
         self.live_on_spirete = asset_loader("lives", "on", 20)
         self.live_off_spirete = asset_loader("lives", "off", 20)
@@ -26,6 +28,9 @@ class Game():
             lives.append(0)
         lives.reverse()
         return lives
+
+    def turn_on_cheat(self):
+        self.cheat = True
 
     def add_points(self, points: int):
         self.highscore += points
@@ -63,6 +68,15 @@ class Game():
     def loose_lives(self):
         self.pacman_lives -= 1
         self.live_list[self.live_list.index(1)] = 0
+
+    def display_Level(self):
+        pg.font.init()
+        font = pg.font.SysFont("arial", 20)
+        text = font.render(f"LEVEL: {str(self.level)}", True, "white")
+        self.screen.blit(text, (350, 10))
+        if self.cheat:
+            text = font.render(f"LEVEL: {str(self.level)} (CHEATMODE)", True, "white")
+            self.screen.blit(text, (350, 10))
 
     def diplay_lives(self):
         x = 700

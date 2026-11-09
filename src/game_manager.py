@@ -88,8 +88,8 @@ class GameManager:
                                 self.config.points_per_super_pacgum,
                                 self.config.lives,
                                 self.screen,
-
-                                score)
+                                score,
+                                i + 1)
         game_loop.window()
             # i += 1
         # self.current_score = final_score
