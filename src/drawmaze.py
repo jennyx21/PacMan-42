@@ -26,6 +26,8 @@ class DrawMaze:
         self.screen = screen
         self.score = score
         self.level = level
+        self.max_time = 90
+
 
     def window(self):
         pg.init()
@@ -36,7 +38,8 @@ class DrawMaze:
         middle = len(self.maze) / 2
         background = pg.Surface((whidth + 2 * 50, height + 2 * 50))
         field = pg.Surface((whidth, height))
-        game = Game(background, self.score, self.lives, self.level)
+        game = Game(background, self.score, self.lives, self.level,
+                    self.max_time)
         pacman = PacMan(field,
                         game,
                         self.maze,
@@ -89,6 +92,7 @@ class DrawMaze:
             game.display_highscore()
             game.diplay_lives()
             game.display_Level()
+            game.display_time()
             if game.lives_info() == 0:
                 running = False
 
