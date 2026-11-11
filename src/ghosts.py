@@ -10,8 +10,9 @@ UP = 1
 RIGHT = 2
 DOWN = 4
 LEFT = 8
+STOP = 0
 
-OPPOSITE = {UP: DOWN, RIGHT: LEFT, DOWN: UP, LEFT: RIGHT}
+OPPOSITE = {UP: DOWN, RIGHT: LEFT, DOWN: UP, LEFT: RIGHT, STOP: 0}
 
 
 class Ghosts(pg.sprite.Sprite):
