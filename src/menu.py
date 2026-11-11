@@ -62,19 +62,22 @@ class GameMenu:
             mapped_events = []
             for event in events:
                 if event.type == pygame.KEYDOWN:
-                    # Map W/S keys to UP/DOWN arrow keys so pygame-menu navigates with WASD
                     if event.key == pygame.K_w:
                         mapped_events.append(
-                            pygame.event.Event(pygame.KEYDOWN, key=pygame.K_UP))
+                            pygame.event.Event(pygame.KEYDOWN,
+                                               key=pygame.K_UP))
                     elif event.key == pygame.K_s:
                         mapped_events.append(
-                            pygame.event.Event(pygame.KEYDOWN, key=pygame.K_DOWN))
+                            pygame.event.Event(pygame.KEYDOWN,
+                                               key=pygame.K_DOWN))
                     elif event.key in (pygame.K_a, pygame.K_LEFT):
                         mapped_events.append(
-                            pygame.event.Event(pygame.KEYDOWN, key=pygame.K_LEFT))
+                            pygame.event.Event(pygame.KEYDOWN,
+                                               key=pygame.K_LEFT))
                     elif event.key in (pygame.K_d, pygame.K_RIGHT):
                         mapped_events.append(
-                            pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RIGHT))
+                            pygame.event.Event(pygame.KEYDOWN,
+                                               key=pygame.K_RIGHT))
                     else:
                         mapped_events.append(event)
                 else:

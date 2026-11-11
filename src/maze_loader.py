@@ -14,71 +14,6 @@ class MazeData:
 
 class MazeLoader:
     @staticmethod
-    def _fallback_maze(width: int, height: int, seed: int = 42) -> MazeData:
-        import random
-        rng = random.Random(seed)
-
-        # 1. Start with all walls closed (15 = 1 | 2 | 4 | 8) for every cell
-        grid = [[15 for _ in range(width)] for _ in range(height)]
-        visited = [[False for _ in range(width)] for _ in range(height)]
-
-        # Directions: (d_row, d_col, current_wall_bit, opposite_wall_bit)
-        # UP: 1, RIGHT: 2, DOWN: 4, LEFT: 8
-        dirs = [
-            (-1, 0, 1, 4),  # UP
-            (0, 1, 2, 8),   # RIGHT
-            (1, 0, 4, 1),   # DOWN
-            (0, -1, 8, 2),  # LEFT
-        ]
-
-        # 2. Carve corridors using DFS
-        def dfs(r: int, c: int) -> None:
-            visited[r][c] = True
-            shuffled_dirs = dirs[:]
-            rng.shuffle(shuffled_dirs)
-
-            for dr, dc, wall, opp in shuffled_dirs:
-                nr, nc = r + dr, c + dc
-                if 0 <= nr < height and 0 <= nc < width and not visited[nr][nc]:
-                    # Knock down the wall between (r, c) and (nr, nc)
-                    grid[r][c] &= ~wall
-                    grid[nr][nc] &= ~opp
-                    dfs(nr, nc)
-
-        # Start carving from (1, 1)
-        dfs(1, 1)
-
-        # 3. Add loops (Pac-Man needs loops so you don't get trapped by ghosts)
-        for r in range(1, height - 1):
-            for c in range(1, width - 1):
-                if rng.random() < 0.20:
-                    dr, dc, wall, opp = rng.choice(dirs)
-                    nr, nc = r + dr, c + dc
-                    if 0 < nr < height - 1 and 0 < nc < width - 1:
-                        grid[r][c] &= ~wall
-                        grid[nr][nc] &= ~opp
-
-        # 4. Clear the center 3x3 spawn area for Pac-Man
-        mid_r, mid_c = height // 2, width // 2
-        for r in range(mid_r - 1, mid_r + 2):
-            for c in range(mid_c - 1, mid_c + 2):
-                if 0 <= r < height and 0 <= c < width:
-                    if r > mid_r - 1:
-                        grid[r][c] &= ~1
-                        grid[r - 1][c] &= ~4
-                    if r < mid_r + 1:
-                        grid[r][c] &= ~4
-                        grid[r + 1][c] &= ~1
-                    if c > mid_c - 1:
-                        grid[r][c] &= ~8
-                        grid[r][c - 1] &= ~2
-                    if c < mid_c + 1:
-                        grid[r][c] &= ~2
-                        grid[r][c + 1] &= ~8
-
-        return MazeData(grid=grid, width=width, height=height)
-
-    @staticmethod
     def load(width: int, height: int, seed: int = 0) -> MazeData:
         try:
             # type: ignore[import-untyped]
@@ -103,7 +38,7 @@ class MazeLoader:
         if (not isinstance(raw_grid, list)
                 or not raw_grid
                 or not isinstance(raw_grid[0], list)):
-            print(f"MazeLoader error: {e}. Using fallback maze.")
+            print("MazeLoader error: Invalid grid. Using fallback maze.")
             return MazeLoader._fallback_maze(width, height, seed=seed)
 
         return MazeData(
@@ -111,3 +46,92 @@ class MazeLoader:
             width=len(raw_grid[0]),
             height=len(raw_grid),
         )
+
+    @staticmethod
+    def _fallback_maze(width: int, height: int, seed: int = 42) -> MazeData:
+        import random
+        rng = random.Random(seed)
+
+        # 1. Start with every cell having all 4 walls (15)
+        grid = []
+        for _ in range(height):
+            grid.append([15] * width)
+
+        visited = []
+        for _ in range(height):
+            visited.append([False] * width)
+
+        # directions: (d_row, d_col, wall_current, wall_neighbor)
+        dirs = [
+            (-1, 0, 1, 4),  # UP
+            (1, 0, 4, 1),   # DOWN
+            (0, 1, 2, 8),   # RIGHT
+            (0, -1, 8, 2),  # LEFT
+        ]
+
+        start_r, start_c = height // 2, width // 2
+        visited[start_r][start_c] = True
+
+        # from_r, from_c, to_r, to_c, wall_curr, wall_next
+        walls = []
+        for dr, dc, w_curr, w_next in dirs:
+            nr, nc = start_r + dr, start_c + dc
+            if 0 <= nr < height and 0 <= nc < width:
+                walls.append((start_r, start_c, nr, nc, w_curr, w_next))
+
+        while walls:
+            # pick random wall
+            idx = rng.randrange(len(walls))
+            r, c, nr, nc, w_curr, w_next = walls.pop(idx)
+
+            if not visited[nr][nc]:
+                # knock down the wall between (r, c) and (nr, nc)
+                grid[r][c] -= w_curr
+                grid[nr][nc] -= w_next
+                visited[nr][nc] = True
+
+                # new unvisited neighbors
+                for dr, dc, nw_curr, nw_next in dirs:
+                    nnr, nnc = nr + dr, nc + dc
+                    if 0 <= nnr < height and 0 <= nnc < width and not visited[nnr][nnc]:
+                        walls.append((nr, nc, nnr, nnc, nw_curr, nw_next))
+
+        # remove 20% of the remaining walls
+        for r in range(1, height - 1):
+            for c in range(1, width - 1):
+                if rng.random() < 0.20:
+                    dr, dc, w_curr, w_next = rng.choice(dirs)
+                    nr, nc = r + dr, c + dc
+                    if 0 < nr < height - 1 and 0 < nc < width - 1:
+                        if grid[r][c] & w_curr:
+                            grid[r][c] -= w_curr
+                            grid[nr][nc] -= w_next
+
+        # clear pac man spawn area
+        for r in range(start_r - 1, start_r + 2):
+            for c in range(start_c - 1, start_c + 2):
+                if 0 <= r < height and 0 <= c < width:
+                    if r > start_r - 1 and (grid[r][c] & 1):
+                        grid[r][c] -= 1
+                        grid[r - 1][c] -= 4
+                    if c > start_c - 1 and (grid[r][c] & 8):
+                        grid[r][c] -= 8
+                        grid[r][c - 1] -= 2
+
+        return MazeData(grid=grid, width=width, height=height)
+
+
+if __name__ == '__main__':
+    from src.drawmaze import DrawMaze
+
+    data = MazeLoader._fallback_maze(12, 12)
+    visualizer = DrawMaze(
+        maze=data.grid,
+        pacgum=42,
+        superpacgum=4,
+        points_pg=10,
+        points_spg=50,
+        lives=3
+    )
+    visualizer.window()
+# uv run python3 -m src.maze_loader
