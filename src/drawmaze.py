@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import pygame as pg
 from pygame import Surface
 from src.player_mechanics import Game
@@ -5,6 +6,12 @@ from src.pacman import PacMan
 from src.pacgum import Pacgum
 from src.ghosts import Blinky, Pinky, Inky, Clyde
 
+
+@dataclass
+class Results():
+    outcome: str
+    score: int
+    lives: int
 
 
 class DrawMaze:
@@ -27,7 +34,6 @@ class DrawMaze:
         self.score = score
         self.level = level
         self.max_time = 90
-
 
     def window(self):
         pg.init()
@@ -89,16 +95,23 @@ class DrawMaze:
                                int(middle * cell_size))
             pacgum.run_gums()
             blinky.run_blinky()
+            pinky.run_pinky()
+            inky.run_inky()
+            clyde.run_clyde()
             game.display_highscore()
             game.diplay_lives()
             game.display_Level()
-            game.display_time()
-            if game.lives_info() == 0:
-                running = False
+            if game.start:
+                game.display_time()
 
-            # pinky.run_pinky()
-            # inky.run_inky()
-            # clyde.run_clyde()
+            if game.level_lost:
+                outcome = "LOSE"
+                return Results(outcome, game.highscore, game.pacman_lives)
+
+            if game.level_win:
+                outcome = "WIN"
+                return Results(outcome, game.highscore, game.pacman_lives)
+
             self.screen.blit(background, background.get_rect())
             self.screen.blit(field,
                              field.get_rect(center=self.screen.

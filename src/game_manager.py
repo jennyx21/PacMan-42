@@ -2,7 +2,7 @@ import pygame as pg
 from enum import Enum, auto
 from src.highscores import HighscoreRecord, Leaderboard, NameInput
 from src.menu import GameMenu
-from src.drawmaze import DrawMaze
+from src.drawmaze import DrawMaze, Results
 from src.maze_loader import MazeLoader, MazeLoaderError
 import sys
 # import GameLevel
@@ -69,8 +69,6 @@ class GameManager:
         # run game loop on self.screen
         # when game ends (death / win):
         i = 0
-        score = 0
-        # while i < 9:
         try:
             level = self.config.levels[i]
             maze_data = MazeLoader.load(
@@ -81,17 +79,24 @@ class GameManager:
         except MazeLoaderError as e:
             print("MazeLoaderError:", e)
             sys.exit(1)
-        game_loop = DrawMaze(maze_data.grid,
-                                self.config.pacgum,
-                                4,
-                                self.config.points_per_pacgum,
-                                self.config.points_per_super_pacgum,
-                                self.config.lives,
-                                self.screen,
-                                score,
-                                i + 1)
-        game_loop.window()
-            # i += 1
+        lives = self.config.lives
+        while i < 9:
+            game_loop = DrawMaze(maze_data.grid,
+                                    self.config.pacgum,
+                                    4,
+                                    self.config.points_per_pacgum,
+                                    self.config.points_per_super_pacgum,
+                                    lives,
+                                    self.screen,
+                                    self.current_score,
+                                    i + 1)
+            
+            result = game_loop.window()
+            self.current_score = result.score
+            lives = result.lives
+            if result.outcome == "LOSE":
+                break
+            i += 1
         # self.current_score = final_score
         self.state = GameState.NAME_INPUT
         # pass
