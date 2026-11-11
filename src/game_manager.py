@@ -30,7 +30,7 @@ class GameManager:
 
         # resources
         self.config = config if config is not None else GameConfig()
-        self.highscores = HighscoreRecord("highscores.json")
+        self.highscores = HighscoreRecord(self.config.highscore_filename)
         self.leaderboard = Leaderboard(self.highscores)
         self.name_input = NameInput(self.highscores)
 
@@ -77,7 +77,9 @@ class GameManager:
             superpacgum=4,
             points_pg=self.config.points_per_pacgum,
             points_spg=self.config.points_per_super_pacgum,
+            points_ghost=self.config.points_per_ghost,
             lives=self.config.lives,
+            max_time=self.config.level_max_time,
             screen=self.screen,
             score=self.current_score,
             level=1,

@@ -12,7 +12,9 @@ class DrawMaze:
                  superpacgum: int,
                  points_pg: int,
                  points_spg: int,
+                 points_ghost: int,
                  lives: int,
+                 max_time: int = 90,
                  screen: Surface | None = None,
                  score: int = 0,
                  level: int = 1):
@@ -21,11 +23,12 @@ class DrawMaze:
         self.superpacgum = superpacgum
         self.points_pacgum = points_pg
         self.points_super_pacgum = points_spg
+        self.points_ghost = points_ghost
         self.lives = lives
         self.screen = screen
         self.score = score
         self.level = level
-        self.max_time = 90
+        self.max_time = max_time
 
     def window(self, screen: Surface | None = None, clock: pg.time.Clock | None = None) -> tuple[str, int]:
         standalone = screen is None
@@ -84,15 +87,6 @@ class DrawMaze:
                         game.turn_on_cheat()
 
             start, pause = game.game_info()
-            keys = pg.key.get_pressed()
-            if keys[pg.K_ESCAPE]:
-                action = "BACK"
-                running = False
-            if keys[pg.K_SPACE] or keys[pg.K_KP_ENTER]:
-                if start is not True:
-                    game.update_start()
-                elif start is True:
-                    game.update_start()
 
             background.fill((15, 10, 40))
             field.fill((15, 10, 40))

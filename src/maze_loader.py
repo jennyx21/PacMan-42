@@ -131,7 +131,9 @@ if __name__ == '__main__':
         superpacgum=4,
         points_pg=10,
         points_spg=50,
-        lives=3
+        points_ghost=200,
+        lives=3,
+        max_time=90
     )
     visualizer.window()
 # uv run python3 -m src.maze_loader

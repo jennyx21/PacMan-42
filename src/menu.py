@@ -78,6 +78,10 @@ class GameMenu:
                         mapped_events.append(
                             pygame.event.Event(pygame.KEYDOWN,
                                                key=pygame.K_RIGHT))
+                    elif event.key == pygame.K_SPACE:
+                        mapped_events.append(
+                            pygame.event.Event(pygame.KEYDOWN,
+                                               key=pygame.K_RETURN))
                     else:
                         mapped_events.append(event)
                 else:
