@@ -2,8 +2,9 @@ import pygame as pg
 from enum import Enum, auto
 from src.highscores import HighscoreRecord, Leaderboard, NameInput
 from src.menu import GameMenu
-# import DrawMaze
-# import GameLevel
+from src.maze_loader import MazeLoader
+from src.drawmaze import DrawMaze
+from src.parser import GameConfig
 
 
 class GameState(Enum):
@@ -28,7 +29,7 @@ class GameManager:
         self.menu = GameMenu(self.screen)
 
         # resources
-        self.config = config
+        self.config = config if config is not None else GameConfig()
         self.highscores = HighscoreRecord("highscores.json")
         self.leaderboard = Leaderboard(self.highscores)
         self.name_input = NameInput(self.highscores)
@@ -64,11 +65,29 @@ class GameManager:
             self.state = GameState.QUIT
 
     def _handle_playing(self) -> None:
-        # run game loop on self.screen
-        # when game ends (death / win):
-        # self.current_score = final_score
-        self.state = GameState.NAME_INPUT
-        # pass
+        level = self.config.levels[0]
+        maze_data = MazeLoader.load(
+            width=level.width,
+            height=level.height,
+            seed=self.config.seed,
+        )
+        visualizer = DrawMaze(
+            maze=maze_data.grid,
+            pacgum=self.config.pacgum,
+            superpacgum=4,
+            points_pg=self.config.points_per_pacgum,
+            points_spg=self.config.points_per_super_pacgum,
+            lives=self.config.lives,
+        )
+        action, final_score = visualizer.window(self.screen, self.clock)
+        self.current_score = final_score
+
+        if action == "QUIT":
+            self.running = False
+        elif action == "BACK":
+            self.state = GameState.MENU
+        else:
+            self.state = GameState.NAME_INPUT
 
     def _handle_name_input(self) -> None:
         action = self.name_input.get_name(

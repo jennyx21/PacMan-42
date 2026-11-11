@@ -23,6 +23,7 @@ class Pacgum(pg.sprite.Sprite):
         self.maze = maze
         self.cell_size = cell_size
         self.pacman = pacman
+        self.score = 0
         self.distrinuted_pacgum = self._distribute()
 
     def _distribute(self):
@@ -47,6 +48,7 @@ class Pacgum(pg.sprite.Sprite):
             rect = gum.get_rect(center=e)
             if self._detect_coaliton(rect):
                 self.distrinuted_pacgum.remove(e)
+                self.score += self.points_pacgum
             else:
                 gum.fill((255, 255, 255))
                 gum_list.append((gum, rect))

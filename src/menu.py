@@ -55,7 +55,36 @@ class GameMenu:
     def run(self) -> str:
         self.action = "QUIT"
         self.menu.enable()
-        self.menu.mainloop(self.surface)
+        clock = pygame.time.Clock()
+
+        while self.menu.is_enabled():
+            events = pygame.event.get()
+            mapped_events = []
+            for event in events:
+                if event.type == pygame.KEYDOWN:
+                    # Map W/S keys to UP/DOWN arrow keys so pygame-menu navigates with WASD
+                    if event.key == pygame.K_w:
+                        mapped_events.append(
+                            pygame.event.Event(pygame.KEYDOWN, key=pygame.K_UP))
+                    elif event.key == pygame.K_s:
+                        mapped_events.append(
+                            pygame.event.Event(pygame.KEYDOWN, key=pygame.K_DOWN))
+                    elif event.key in (pygame.K_a, pygame.K_LEFT):
+                        mapped_events.append(
+                            pygame.event.Event(pygame.KEYDOWN, key=pygame.K_LEFT))
+                    elif event.key in (pygame.K_d, pygame.K_RIGHT):
+                        mapped_events.append(
+                            pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RIGHT))
+                    else:
+                        mapped_events.append(event)
+                else:
+                    mapped_events.append(event)
+
+            self.menu.update(mapped_events)
+            self.menu.draw(self.surface)
+            pygame.display.flip()
+            clock.tick(60)
+
         return self.action
 
 

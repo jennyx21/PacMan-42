@@ -20,15 +20,19 @@ class DrawMaze:
         self.points_super_pacgum = points_spg
         self.lives = lives
 
-    def window(self):
-        pg.init()
-        clock = pg.time.Clock()
-        whidth: int = 800
-        height: int = 800
+    def window(self, screen: Surface | None = None, clock: pg.time.Clock | None = None) -> tuple[str, int]:
+        standalone = screen is None
+        if standalone:
+            pg.init()
+            whidth: int = 800
+            height: int = 800
+            screen = pg.display.set_mode((whidth, height))
+            pg.display.set_caption("Pac Man")
+            clock = pg.time.Clock()
+
+        whidth, height = screen.get_size()
         cell_size = whidth / len(self.maze)
         middle = len(self.maze) / 2
-        screen = pg.display.set_mode((whidth, height))
-        pg.display.set_caption("Pac Man")
         game = Game()
         pacman = PacMan(screen,
                         game,
@@ -50,16 +54,19 @@ class DrawMaze:
         #                 pacman,
         #                 game)
         blinky = Blinky(screen, cell_size, self.maze, pacman, game)
+        action = "GAME_OVER"
         running = True
 
         while running:
             for event in pg.event.get():
                 if event.type is pg.QUIT:
+                    action = "QUIT"
                     running = False
 
             start, pause = game.game_info()
             keys = pg.key.get_pressed()
             if keys[pg.K_ESCAPE]:
+                action = "BACK"
                 running = False
             if keys[pg.K_SPACE] or keys[pg.K_KP_ENTER]:
                 if start is not True:
@@ -77,9 +84,18 @@ class DrawMaze:
             blinky.run_blinky()
             # ghosts.draw_ghosts()
 
+            # Win condition: all pacgums collected
+            if not pacgum.distrinuted_pacgum:
+                action = "WIN"
+                running = False
+
             pg.display.flip()
             clock.tick(60)
-        pg.quit()
+
+        if standalone:
+            pg.quit()
+
+        return action, pacgum.score
 
     def draw_walls(self,
                    cell_size: float,

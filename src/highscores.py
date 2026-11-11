@@ -218,13 +218,16 @@ class NameInput:
                             return "SUBMIT"
                     elif event.key == pg.K_BACKSPACE:
                         name = name[:-1]
+                        msg = ""
                     else:
-                        if not name.isalnum():
-                            msg = "Enter only letters, numbers, and spaces :("
-                        elif len(name) < 10 and (
-                                event.unicode.isalnum() or
-                                event.unicode == " "):
+                        if not (event.unicode.isalnum() or event.unicode == " "):
+                            if event.unicode:  # only show error if a printable non-alnum key was pressed
+                                msg = "Enter only letters, numbers, and spaces :("
+                        elif len(name) >= 10:
+                            msg = "Maximum 10 characters :("
+                        else:
                             name += event.unicode
+                            msg = ""
             clock.tick(60)
 
 

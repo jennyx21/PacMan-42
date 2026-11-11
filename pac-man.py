@@ -27,29 +27,29 @@ def run() -> None:
         print(f"Error: File '{config_path}' not found.")
         sys.exit(1)
 
-    # just for testing
-    try:
-        level = config.levels[1]
-        maze_data = MazeLoader.load(
-            width=level.width,
-            height=level.height,
-            seed=config.seed,
-        )
-        print(f"\n\nmaze generated: {maze_data.width}x{maze_data.height}")
+    # # just for testing
+    # try:
+    #     level = config.levels[1]
+    #     maze_data = MazeLoader.load(
+    #         width=level.width,
+    #         height=level.height,
+    #         seed=config.seed,
+    #     )
+    #     print(f"\n\nmaze generated: {maze_data.width}x{maze_data.height}")
 
-        visualizer = DrawMaze(maze_data.grid,
-                              config.pacgum,
-                              4,
-                              config.points_per_pacgum,
-                              config.points_per_super_pacgum,
-                              config.lives)
-        visualizer.window()
-    except MazeLoaderError as e:
-        print("MazeLoaderError:", e)
-        sys.exit(1)
+    #     visualizer = DrawMaze(maze_data.grid,
+    #                           config.pacgum,
+    #                           4,
+    #                           config.points_per_pacgum,
+    #                           config.points_per_super_pacgum,
+    #                           config.lives)
+    #     visualizer.window()
+    # except MazeLoaderError as e:
+    #     print("MazeLoaderError:", e)
+    #     sys.exit(1)
 
-    # game = GameManager(config)
-    # game.run()
+    game = GameManager(config)
+    game.run()
 
 
 if __name__ == "__main__":
