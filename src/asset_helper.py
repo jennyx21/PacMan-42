@@ -10,5 +10,4 @@ def asset_loader(name: str, direction: str, size: int):
     for i in files:
         image = pygame.image.load(str(i)).convert_alpha()
         loaded_assets.append(pygame.transform.scale_by(image, 20 / size))
-
     return loaded_assets

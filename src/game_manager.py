@@ -2,7 +2,7 @@ import pygame as pg
 from enum import Enum, auto
 from src.highscores import HighscoreRecord, Leaderboard, NameInput
 from src.menu import GameMenu
-from src.maze_loader import MazeLoader
+from src.maze_loader import MazeLoader, MazeLoaderError
 from src.drawmaze import DrawMaze
 from src.parser import GameConfig
 
@@ -78,6 +78,9 @@ class GameManager:
             points_pg=self.config.points_per_pacgum,
             points_spg=self.config.points_per_super_pacgum,
             lives=self.config.lives,
+            screen=self.screen,
+            score=self.current_score,
+            level=1,
         )
         action, final_score = visualizer.window(self.screen, self.clock)
         self.current_score = final_score

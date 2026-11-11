@@ -17,7 +17,7 @@ class PacMan(pg.sprite.Sprite, Game):
                  game: Game,
                  maze: list[list[int]],
                  cell_size: float,
-                 start_cell: tuple[int, int], 
+                 start_cell: tuple[int, int],
                  lives: int):
         super().__init__()
         self.screen = screen
@@ -33,6 +33,7 @@ class PacMan(pg.sprite.Sprite, Game):
 
         self.current_sprite = self.sprite_right
         self.current = 0
+        self.start_cell = start_cell
         self.col, self.row = start_cell
         self.old_col = 0
         self.old_row = 0

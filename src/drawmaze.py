@@ -3,7 +3,7 @@ from pygame import Surface
 from src.player_mechanics import Game
 from src.pacman import PacMan
 from src.pacgum import Pacgum
-from src.ghosts import Ghosts, Blinky
+from src.ghosts import Blinky, Pinky, Inky, Clyde
 
 
 class DrawMaze:
@@ -12,56 +12,76 @@ class DrawMaze:
                  superpacgum: int,
                  points_pg: int,
                  points_spg: int,
-                 lives: int):
+                 lives: int,
+                 screen: Surface | None = None,
+                 score: int = 0,
+                 level: int = 1):
         self.maze = maze
         self.pacgum = pacgum
         self.superpacgum = superpacgum
         self.points_pacgum = points_pg
         self.points_super_pacgum = points_spg
         self.lives = lives
+        self.screen = screen
+        self.score = score
+        self.level = level
+        self.max_time = 90
 
     def window(self, screen: Surface | None = None, clock: pg.time.Clock | None = None) -> tuple[str, int]:
         standalone = screen is None
         if standalone:
             pg.init()
-            whidth: int = 800
-            height: int = 800
-            screen = pg.display.set_mode((whidth, height))
+            clock = pg.time.Clock()
+            whidth: int = 700
+            height: int = 700
+            self.screen = pg.display.set_mode(
+                (whidth + 2 * 50, height + 2 * 50))
             pg.display.set_caption("Pac Man")
+        elif screen is not None:
+            self.screen = screen
+
+        if clock is None:
             clock = pg.time.Clock()
 
-        whidth, height = screen.get_size()
+        whidth: int = 700
+        height: int = 700
         cell_size = whidth / len(self.maze)
         middle = len(self.maze) / 2
-        game = Game()
-        pacman = PacMan(screen,
+        background = pg.Surface((whidth + 2 * 50, height + 2 * 50))
+        field = pg.Surface((whidth, height))
+        game = Game(background, self.score, self.lives, self.level,
+                    self.max_time)
+        pacman = PacMan(field,
                         game,
                         self.maze,
                         cell_size,
-                        (int(middle), int(middle)), 
+                        (int(middle), int(middle)),
                         self.lives)
-        pacgum = Pacgum(screen,
+        pacgum = Pacgum(field,
                         self.pacgum,
                         self.superpacgum,
                         self.points_pacgum,
                         self.points_super_pacgum,
                         self.maze,
                         cell_size,
-                        pacman)
-        # ghosts = Ghosts(screen,
-        #                 self.maze,
-        #                 cell_size,
-        #                 pacman,
-        #                 game)
-        blinky = Blinky(screen, cell_size, self.maze, pacman, game)
+                        pacman,
+                        game)
+        blinky = Blinky(field, cell_size, self.maze, pacman, game)
+        pinky = Pinky(field, cell_size, self.maze, pacman, game)
+        inky = Inky(field, cell_size, self.maze, pacman, game)
+        clyde = Clyde(field, cell_size, self.maze, pacman, game)
         action = "GAME_OVER"
         running = True
 
         while running:
-            for event in pg.event.get():
+            events = pg.event.get()
+            for event in events:
                 if event.type is pg.QUIT:
                     action = "QUIT"
                     running = False
+                if event.type == pg.KEYDOWN:
+                    if event.key is pg.K_c:
+                        game.turn_on_cheat()
 
             start, pause = game.game_info()
             keys = pg.key.get_pressed()
@@ -74,28 +94,42 @@ class DrawMaze:
                 elif start is True:
                     game.update_start()
 
-            screen.fill((5, 0, 25))
-            self.draw_walls(cell_size, screen, (100, 90, 175), 8, 3)
-            self.draw_walls(cell_size, screen, (175, 170, 255), 3)
+            background.fill((15, 10, 40))
+            field.fill((15, 10, 40))
+            self.draw_walls(cell_size, field, (100, 90, 175), 8, 3)
+            self.draw_walls(cell_size, field, (175, 170, 255), 3)
 
             pacman.draw_pacman(int(middle * cell_size),
                                int(middle * cell_size))
-            pacgum.draw_pacgum()
+            pacgum.run_gums()
             blinky.run_blinky()
-            # ghosts.draw_ghosts()
+            game.display_highscore()
+            game.diplay_lives()
+            game.display_Level()
+            game.display_time()
+            if game.lives_info() == 0:
+                action = "GAME_OVER"
+                running = False
 
-            # Win condition: all pacgums collected
-            if not pacgum.distrinuted_pacgum:
+            # Win condition: all regular pacgums and super pacgums collected
+            if not pacgum.distributed_pacgum and not pacgum.distribute_superpacgum:
                 action = "WIN"
                 running = False
 
+            # pinky.run_pinky()
+            # inky.run_inky()
+            # clyde.run_clyde()
+            self.screen.blit(background, background.get_rect())
+            self.screen.blit(field,
+                             field.get_rect(center=self.screen.
+                                            get_rect().center))
             pg.display.flip()
             clock.tick(60)
 
         if standalone:
             pg.quit()
 
-        return action, pacgum.score
+        return action, game.highscore
 
     def draw_walls(self,
                    cell_size: float,

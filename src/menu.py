@@ -81,7 +81,8 @@ class GameMenu:
                     mapped_events.append(event)
 
             self.menu.update(mapped_events)
-            self.menu.draw(self.surface)
+            if self.menu.is_enabled():
+                self.menu.draw(self.surface)
             pygame.display.flip()
             clock.tick(60)
 
