@@ -10,8 +10,9 @@ UP = 1
 RIGHT = 2
 DOWN = 4
 LEFT = 8
+STOP = 0
 
-OPPOSITE = {UP: DOWN, RIGHT: LEFT, DOWN: UP, LEFT: RIGHT}
+OPPOSITE = {UP: DOWN, RIGHT: LEFT, DOWN: UP, LEFT: RIGHT, STOP: 0}
 
 
 class Ghosts(pg.sprite.Sprite):
@@ -329,42 +330,118 @@ class Pinky(Ghosts):
         self.speed = 1.2 + 10 / len(self.maze)
         self.path: list = None
         self.edible = False
+        self.edible_timer = 15000
+        self.time = 0
+        self.checked = 0
+        self.sprite_up = asset_loader("pinky", "up", len(self.maze) / 0.5)
+        self.sprite_left = asset_loader("pinky",
+                                        "left", len(self.maze) / 0.5)
+        self.sprite_right = asset_loader("pinky",
+                                         "right", len(self.maze) / 0.5)
+        self.sprite_down = asset_loader("pinky",
+                                        "down", len(self.maze) / 0.5)
+        self.sprite_edibleup = asset_loader("edible", "up",
+                                            len(self.maze) / 0.5)
+        self.sprite_edibleleft = asset_loader("edible", "left",
+                                              len(self.maze) / 0.5)
+        self.sprite_edibleright = asset_loader("edible", "right",
+                                               len(self.maze) / 0.5)
+        self.sprite_edibledown = asset_loader("edible", "down",
+                                              len(self.maze) / 0.5)
+        self.current = 0
+        self.current_sprite = self.sprite_down
+
+
+    def switch_sprite(self):
+        if self.direction == UP:
+            self.current_sprite = self.sprite_up
+        if self.direction == DOWN:
+            self.current_sprite = self.sprite_down
+        if self.direction == LEFT:
+            self.current_sprite = self.sprite_left
+        if self.direction == RIGHT:
+            self.current_sprite = self.sprite_right
+
+    def switch_edible_sprite(self):
+        if self.direction == UP:
+            self.current_sprite = self.sprite_edibleup
+        if self.direction == DOWN:
+            self.current_sprite = self.sprite_edibledown
+        if self.direction == LEFT:
+            self.current_sprite = self.sprite_edibleleft
+        if self.direction == RIGHT:
+            self.current_sprite = self.sprite_edibleright
+
+    def pinky_target(self):
+        col, row = self.find_target()
+        col += 2
+        if col > len(self.maze):
+            col -= 4
+        return col, row
 
     def run_pinky(self):
-        pinky = pg.Surface((10, 10))
-        rect = pinky.get_rect(center=(self.x, self.y))
-        if not self.edible:
-            pinky.fill("red")
-            self.speed = 1.2 + 10 / len(self.maze)
-            self.path, self.x, self.y = self.move(self.x, self.y,
-                                                  self.direction,
-                                                  self.speed,
-                                                  self.find_target(),
-                                                  self.path)
-            if self.game.signal and self.checked == 0:
-                self.edible = True
-                self.checked = 1
-                self.time = pg.time.get_ticks() + self.edible_timer
-            if self._detect_coaliton_ghosts(rect):
-                row, col = self.pacman.start_cell
-                self.pacman.x, self.pacman.y = self.cell_center(row, col)
-                self.x, self.y = self.pinky_start
+        start, pause = self.game.game_info()
+        if start:
+            if not pause:
+                if not self.edible:
+                    image = self.current_sprite[0]
+                    rect = image.get_rect(center=(self.x, self.y))
+                    self.speed = 1.2 + 10 / len(self.maze)
+                    self.path, self.x, self.y = self.move(self.x, self.y,
+                                                          self.direction,
+                                                          self.speed,
+                                                          self.pinky_target(),
+                                                          self.path)
+                    if self.game.signal and self.checked == 0:
+                        self.edible = True
+                        self.checked = 1
+                        self.time = pg.time.get_ticks() + self.edible_timer
+
+                    if self._detect_coaliton_ghosts(rect) and not self.game.cheat:
+                        self.game.loose_lives()
+                        row, col = self.pacman.start_cell
+                        self.pacman.x, self.pacman.y = self.cell_center(row,
+                                                                        col)
+                        self.x, self.y = self.pinky_start
+                    self.switch_sprite()
+                else:
+                    if self.game.signal and self.checked == 0:
+                        self.edible = True
+                        self.checked = 1
+                        self.time = pg.time.get_ticks() + self.edible_timer
+                    self.switch_edible_sprite()
+                    if self.time - 5000 < pg.time.get_ticks():
+                        if self.current < len(self.current_sprite):
+                            image = self.current_sprite[int(self.current)]
+                            rect = image.get_rect(center=(self.x, self.y))
+                        else:
+                            self.current = 0
+                            image = self.current_sprite[int(self.current)]
+                            rect = image.get_rect(center=(self.x, self.y))
+                    else:
+                        image = self.current_sprite[0]
+                        rect = image.get_rect(center=(self.x, self.y))
+                    if self.time <= pg.time.get_ticks():
+                        self.edible = False
+                    self.speed = 1 + 10 / len(self.maze)
+                    self.direction, self.x, self.y = self.run(self.x,
+                                                              self.y,
+                                                              self.direction,
+                                                              self.speed)
+                    if self._detect_coaliton_ghosts(rect):
+                        self.x, self.y = self.pinky_start
+                        self.edible = False
+# hard codet Points of the ghost.. need to be changed
+                        self.game.add_points(200)
+                    self.current += 0.2
+            else:
+                image = self.current_sprite[0]
+                rect = image.get_rect(center=(self.x, self.y))
         else:
-            pinky.fill("gray")
-            self.speed = 1 + 10 / len(self.maze)
-            self.direction, self.x, self.y = self.run(self.x,
-                                                      self.y,
-                                                      self.direction,
-                                                      self.speed)
-            if self.time <= pg.time.get_ticks():
-                self.edible = False
-            if self._detect_coaliton(rect):
-                row, col = self.pacman.start_cell
-                self.pacman.x, self.pacman.y = self.cell_center(row, col)
-                self.x, self.y = self.pinky_start
-                self.edible = False
+            image = self.current_sprite[0]
+            rect = image.get_rect(center=(self.x, self.y))
         self.checked = 0
-        self.screen.blit(pinky, rect)
+        self.screen.blit(image, rect)
 
 
 class Inky(Ghosts):
@@ -386,42 +463,117 @@ class Inky(Ghosts):
         self.speed = 1.2 + 10 / len(self.maze)
         self.path: list = None
         self.edible = False
+        self.edible_timer = 15000
+        self.time = 0
+        self.checked = 0
+        self.sprite_up = asset_loader("inky", "up", len(self.maze) / 0.5)
+        self.sprite_left = asset_loader("inky",
+                                        "left", len(self.maze) / 0.5)
+        self.sprite_right = asset_loader("inky",
+                                         "right", len(self.maze) / 0.5)
+        self.sprite_down = asset_loader("inky",
+                                        "down", len(self.maze) / 0.5)
+        self.sprite_edibleup = asset_loader("edible", "up",
+                                            len(self.maze) / 0.5)
+        self.sprite_edibleleft = asset_loader("edible", "left",
+                                              len(self.maze) / 0.5)
+        self.sprite_edibleright = asset_loader("edible", "right",
+                                               len(self.maze) / 0.5)
+        self.sprite_edibledown = asset_loader("edible", "down",
+                                              len(self.maze) / 0.5)
+        self.current = 0
+        self.current_sprite = self.sprite_down
+
+    def switch_sprite(self):
+        if self.direction == UP:
+            self.current_sprite = self.sprite_up
+        if self.direction == DOWN:
+            self.current_sprite = self.sprite_down
+        if self.direction == LEFT:
+            self.current_sprite = self.sprite_left
+        if self.direction == RIGHT:
+            self.current_sprite = self.sprite_right
+
+    def switch_edible_sprite(self):
+        if self.direction == UP:
+            self.current_sprite = self.sprite_edibleup
+        if self.direction == DOWN:
+            self.current_sprite = self.sprite_edibledown
+        if self.direction == LEFT:
+            self.current_sprite = self.sprite_edibleleft
+        if self.direction == RIGHT:
+            self.current_sprite = self.sprite_edibleright
+
+    def inky_target(self):
+        col, row = self.find_target()
+        row += 2
+        if row > len(self.maze):
+            row -= 4
+        return col, row
 
     def run_inky(self):
-        inky = pg.Surface((10, 10))
-        rect = inky.get_rect(center=(self.x, self.y))
-        if not self.edible:
-            inky.fill("red")
-            self.speed = 1.2 + 10 / len(self.maze)
-            self.path, self.x, self.y = self.move(self.x, self.y,
-                                                  self.direction,
-                                                  self.speed,
-                                                  self.find_target(),
-                                                  self.path)
-            if self.game.signal and self.checked == 0:
-                self.edible = True
-                self.checked = 1
-                self.time = pg.time.get_ticks() + self.edible_timer
-            if self._detect_coaliton_ghosts(rect):
-                row, col = self.pacman.start_cell
-                self.pacman.x, self.pacman.y = self.cell_center(row, col)
-                self.x, self.y = self.pinky_start
+        start, pause = self.game.game_info()
+        if start:
+            if not pause:
+                if not self.edible:
+                    image = self.current_sprite[0]
+                    rect = image.get_rect(center=(self.x, self.y))
+                    self.speed = 1.2 + 10 / len(self.maze)
+                    self.path, self.x, self.y = self.move(self.x, self.y,
+                                                          self.direction,
+                                                          self.speed,
+                                                          self.inky_target(),
+                                                          self.path)
+                    if self.game.signal and self.checked == 0:
+                        self.edible = True
+                        self.checked = 1
+                        self.time = pg.time.get_ticks() + self.edible_timer
+
+                    if self._detect_coaliton_ghosts(rect) and not self.game.cheat:
+                        self.game.loose_lives()
+                        row, col = self.pacman.start_cell
+                        self.pacman.x, self.pacman.y = self.cell_center(row,
+                                                                        col)
+                        self.x, self.y = self.inky_start
+                    self.switch_sprite()
+                else:
+                    if self.game.signal and self.checked == 0:
+                        self.edible = True
+                        self.checked = 1
+                        self.time = pg.time.get_ticks() + self.edible_timer
+                    self.switch_edible_sprite()
+                    if self.time - 5000 < pg.time.get_ticks():
+                        if self.current < len(self.current_sprite):
+                            image = self.current_sprite[int(self.current)]
+                            rect = image.get_rect(center=(self.x, self.y))
+                        else:
+                            self.current = 0
+                            image = self.current_sprite[int(self.current)]
+                            rect = image.get_rect(center=(self.x, self.y))
+                    else:
+                        image = self.current_sprite[0]
+                        rect = image.get_rect(center=(self.x, self.y))
+                    if self.time <= pg.time.get_ticks():
+                        self.edible = False
+                    self.speed = 1 + 10 / len(self.maze)
+                    self.direction, self.x, self.y = self.run(self.x,
+                                                              self.y,
+                                                              self.direction,
+                                                              self.speed)
+                    if self._detect_coaliton_ghosts(rect):
+                        self.x, self.y = self.inky_start
+                        self.edible = False
+# hard codet Points of the ghost.. need to be changed
+                        self.game.add_points(200)
+                    self.current += 0.2
+            else:
+                image = self.current_sprite[0]
+                rect = image.get_rect(center=(self.x, self.y))
         else:
-            inky.fill("gray")
-            self.speed = 1 + 10 / len(self.maze)
-            self.direction, self.x, self.y = self.run(self.x,
-                                                      self.y,
-                                                      self.direction,
-                                                      self.speed)
-            if self.time <= pg.time.get_ticks():
-                self.edible = False
-            if self._detect_coaliton(rect):
-                row, col = self.pacman.start_cell
-                self.pacman.x, self.pacman.y = self.cell_center(row, col)
-                self.x, self.y = self.pinky_start
-                self.edible = False
+            image = self.current_sprite[0]
+            rect = image.get_rect(center=(self.x, self.y))
         self.checked = 0
-        self.screen.blit(inky, rect)
+        self.screen.blit(image, rect)
 
 
 class Clyde(Ghosts):
@@ -443,40 +595,116 @@ class Clyde(Ghosts):
         self.speed = 1.2 + 10 / len(self.maze)
         self.path: list = None
         self.edible = False
+        self.edible_timer = 15000
+        self.time = 0
+        self.checked = 0
+        self.sprite_up = asset_loader("clyde", "up", len(self.maze) / 0.5)
+        self.sprite_left = asset_loader("clyde",
+                                        "left", len(self.maze) / 0.5)
+        self.sprite_right = asset_loader("clyde",
+                                         "right", len(self.maze) / 0.5)
+        self.sprite_down = asset_loader("clyde",
+                                        "down", len(self.maze) / 0.5)
+        self.sprite_edibleup = asset_loader("edible", "up",
+                                            len(self.maze) / 0.5)
+        self.sprite_edibleleft = asset_loader("edible", "left",
+                                              len(self.maze) / 0.5)
+        self.sprite_edibleright = asset_loader("edible", "right",
+                                               len(self.maze) / 0.5)
+        self.sprite_edibledown = asset_loader("edible", "down",
+                                              len(self.maze) / 0.5)
+        self.current = 0
+        self.current_sprite = self.sprite_down
+
+    def switch_sprite(self):
+        if self.direction == UP:
+            self.current_sprite = self.sprite_up
+        if self.direction == DOWN:
+            self.current_sprite = self.sprite_down
+        if self.direction == LEFT:
+            self.current_sprite = self.sprite_left
+        if self.direction == RIGHT:
+            self.current_sprite = self.sprite_right
+
+    def switch_edible_sprite(self):
+        if self.direction == UP:
+            self.current_sprite = self.sprite_edibleup
+        if self.direction == DOWN:
+            self.current_sprite = self.sprite_edibledown
+        if self.direction == LEFT:
+            self.current_sprite = self.sprite_edibleleft
+        if self.direction == RIGHT:
+            self.current_sprite = self.sprite_edibleright
+
+    def clyde_target(self):
+        col, row = self.find_target()
+        c_col, c_row = self.current_cell(self.x, self.y)
+        if abs(row - c_row) < 5 or abs(col - c_col) < 5:
+            row = len(self.maze)
+            col = len(self.maze)
+        return col, row
+
 
     def run_clyde(self):
-        clyde = pg.Surface((10, 10))
-        rect = clyde.get_rect(center=(self.x, self.y))
-        if not self.edible:
-            clyde.fill("red")
-            self.speed = 1.2 + 10 / len(self.maze)
-            self.path, self.x, self.y = self.move(self.x, self.y,
-                                                  self.direction,
-                                                  self.speed,
-                                                  self.find_target(),
-                                                  self.path)
-            if self.game.signal and self.checked == 0:
-                self.edible = True
-                self.checked = 1
-                self.time = pg.time.get_ticks() + self.edible_timer
+        start, pause = self.game.game_info()
+        if start:
+            if not pause:
+                if not self.edible:
+                    image = self.current_sprite[0]
+                    rect = image.get_rect(center=(self.x, self.y))
+                    self.speed = 1.2 + 10 / len(self.maze)
+                    self.path, self.x, self.y = self.move(self.x, self.y,
+                                                          self.direction,
+                                                          self.speed,
+                                                          self.clyde_target(),
+                                                          self.path)
+                    if self.game.signal and self.checked == 0:
+                        self.edible = True
+                        self.checked = 1
+                        self.time = pg.time.get_ticks() + self.edible_timer
 
-            if self._detect_coaliton_ghosts(rect):
-                row, col = self.pacman.start_cell
-                self.pacman.x, self.pacman.y = self.cell_center(row, col)
-                self.x, self.y = self.clyde_start
+                    if self._detect_coaliton_ghosts(rect) and not self.game.cheat:
+                        self.game.loose_lives()
+                        row, col = self.pacman.start_cell
+                        self.pacman.x, self.pacman.y = self.cell_center(row,
+                                                                        col)
+                        self.x, self.y = self.clyde_start
+                    self.switch_sprite()
+                else:
+                    if self.game.signal and self.checked == 0:
+                        self.edible = True
+                        self.checked = 1
+                        self.time = pg.time.get_ticks() + self.edible_timer
+                    self.switch_edible_sprite()
+                    if self.time - 5000 < pg.time.get_ticks():
+                        if self.current < len(self.current_sprite):
+                            image = self.current_sprite[int(self.current)]
+                            rect = image.get_rect(center=(self.x, self.y))
+                        else:
+                            self.current = 0
+                            image = self.current_sprite[int(self.current)]
+                            rect = image.get_rect(center=(self.x, self.y))
+                    else:
+                        image = self.current_sprite[0]
+                        rect = image.get_rect(center=(self.x, self.y))
+                    if self.time <= pg.time.get_ticks():
+                        self.edible = False
+                    self.speed = 1 + 10 / len(self.maze)
+                    self.direction, self.x, self.y = self.run(self.x,
+                                                              self.y,
+                                                              self.direction,
+                                                              self.speed)
+                    if self._detect_coaliton_ghosts(rect):
+                        self.x, self.y = self.clyde_start
+                        self.edible = False
+# hard codet Points of the ghost.. need to be changed
+                        self.game.add_points(200)
+                    self.current += 0.2
+            else:
+                image = self.current_sprite[0]
+                rect = image.get_rect(center=(self.x, self.y))
         else:
-            clyde.fill("gray")
-            self.speed = 1 + 10 / len(self.maze)
-            self.direction, self.x, self.y = self.run(self.x,
-                                                      self.y,
-                                                      self.direction,
-                                                      self.speed)
-            if self.time <= pg.time.get_ticks():
-                self.edible = False
-            if self._detect_coaliton(rect):
-                row, col = self.pacman.start_cell
-                self.pacman.x, self.pacman.y = self.cell_center(row, col)
-                self.x, self.y = self.clyde_start
-                self.edible = False
+            image = self.current_sprite[0]
+            rect = image.get_rect(center=(self.x, self.y))
         self.checked = 0
-        self.screen.blit(clyde, rect)
+        self.screen.blit(image, rect)

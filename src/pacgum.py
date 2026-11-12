@@ -92,6 +92,8 @@ class Pacgum(pg.sprite.Sprite):
             else:
                 supergum.fill("white")
                 super_gum_list.append((supergum, super_rect))
+        if not self.distribute_superpacgum and not self.distributed_pacgum:
+            self.game.level_endstate()
         for i in super_gum_list:
             g, r = i
             self.screen.blit(g, r)

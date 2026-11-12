@@ -18,6 +18,8 @@ class Game():
         self.level = level
         self.max_time = max_time
         self.time = pg.time.get_ticks()
+        self.level_win = False
+        self.level_lost = False
 
         self.live_on_spirete = asset_loader("lives", "on", 20)
         self.live_off_spirete = asset_loader("lives", "off", 20)
@@ -69,8 +71,11 @@ class Game():
         self.screen.blit(text, (10, 10))
 
     def loose_lives(self):
-        self.pacman_lives -= 1
-        self.live_list[self.live_list.index(1)] = 0
+        if self.pacman_lives > 0:
+            self.pacman_lives -= 1
+            self.live_list[self.live_list.index(1)] = 0
+        else:
+            self.level_loose()
 
     def display_Level(self):
         pg.font.init()
@@ -94,13 +99,17 @@ class Game():
             x += 33
             self.screen.blit(image, rect)
 
-    def lives_info(self):
-        return self.pacman_lives
+    def level_endstate(self):
+        self.level_win = True
+
+    def level_loose(self):
+        self.level_lost = True
 
     def display_time(self):
         time = pg.time.get_ticks()
-        x = 790
         if time < self.time + self.max_time * 1000:
-            x = (self.time / self.max_time * 1000 / time)
-            print(x)
-            pg.draw.line(self.screen, ("green"), (10, 750), (x, 750), 25)
+            remaining_time = self.time + self.max_time * 1000 - time
+            x = 700 * (remaining_time / (self.max_time * 1000))
+            pg.draw.line(self.screen, ("green"), (50, 775), (50 + x, 775), 25)
+        else:
+            self.level_loose()

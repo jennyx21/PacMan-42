@@ -2,8 +2,8 @@ import pygame as pg
 from enum import Enum, auto
 from src.highscores import HighscoreRecord, Leaderboard, NameInput
 from src.menu import GameMenu
+from src.drawmaze import DrawMaze, Results
 from src.maze_loader import MazeLoader, MazeLoaderError
-from src.drawmaze import DrawMaze
 from src.parser import GameConfig
 
 
@@ -65,34 +65,35 @@ class GameManager:
             self.state = GameState.QUIT
 
     def _handle_playing(self) -> None:
-        level = self.config.levels[0]
-        maze_data = MazeLoader.load(
-            width=level.width,
-            height=level.height,
-            seed=self.config.seed,
-        )
-        visualizer = DrawMaze(
-            maze=maze_data.grid,
-            pacgum=self.config.pacgum,
-            superpacgum=4,
-            points_pg=self.config.points_per_pacgum,
-            points_spg=self.config.points_per_super_pacgum,
-            points_ghost=self.config.points_per_ghost,
-            lives=self.config.lives,
-            max_time=self.config.level_max_time,
-            screen=self.screen,
-            score=self.current_score,
-            level=1,
-        )
-        action, final_score = visualizer.window(self.screen, self.clock)
-        self.current_score = final_score
-
-        if action == "QUIT":
-            self.running = False
-        elif action == "BACK":
-            self.state = GameState.MENU
-        else:
-            self.state = GameState.NAME_INPUT
+        # run game loop on self.screen
+        # when game ends (death / win):
+        i = 0
+        score = 0
+        # while i < 9:
+        try:
+            level = self.config.levels[i]
+            maze_data = MazeLoader.load(
+                width=level.width,
+                height=level.height,
+                seed=self.config.seed,
+            )
+        except MazeLoaderError as e:
+            print("MazeLoaderError:", e)
+            sys.exit(1)
+        game_loop = DrawMaze(maze_data.grid,
+                                self.config.pacgum,
+                                4,
+                                self.config.points_per_pacgum,
+                                self.config.points_per_super_pacgum,
+                                self.config.lives,
+                                self.screen,
+                                score,
+                                i + 1)
+        game_loop.window()
+            # i += 1
+        # self.current_score = final_score
+        self.state = GameState.NAME_INPUT
+        # pass
 
     def _handle_name_input(self) -> None:
         action = self.name_input.get_name(
