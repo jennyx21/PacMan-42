@@ -65,35 +65,34 @@ class GameManager:
             self.state = GameState.QUIT
 
     def _handle_playing(self) -> None:
-        # run game loop on self.screen
-        # when game ends (death / win):
-        i = 0
-        score = 0
-        # while i < 9:
-        try:
-            level = self.config.levels[i]
-            maze_data = MazeLoader.load(
-                width=level.width,
-                height=level.height,
-                seed=self.config.seed,
-            )
-        except MazeLoaderError as e:
-            print("MazeLoaderError:", e)
-            sys.exit(1)
-        game_loop = DrawMaze(maze_data.grid,
-                                self.config.pacgum,
-                                4,
-                                self.config.points_per_pacgum,
-                                self.config.points_per_super_pacgum,
-                                self.config.lives,
-                                self.screen,
-                                score,
-                                i + 1)
-        game_loop.window()
-            # i += 1
-        # self.current_score = final_score
-        self.state = GameState.NAME_INPUT
-        # pass
+        level = self.config.levels[0]
+        maze_data = MazeLoader.load(
+            width=level.width,
+            height=level.height,
+            seed=self.config.seed,
+        )
+        game_loop = DrawMaze(
+            maze=maze_data.grid,
+            pacgum=self.config.pacgum,
+            superpacgum=4,
+            points_pg=self.config.points_per_pacgum,
+            points_spg=self.config.points_per_super_pacgum,
+            points_ghost=self.config.points_per_ghost,
+            lives=self.config.lives,
+            max_time=self.config.level_max_time,
+            screen=self.screen,
+            score=self.current_score,
+            level=1,
+        )
+        result = game_loop.window(self.screen, self.clock)
+        self.current_score = result.score
+
+        if result.outcome == "QUIT":
+            self.running = False
+        elif result.outcome == "BACK":
+            self.state = GameState.MENU
+        else:
+            self.state = GameState.NAME_INPUT
 
     def _handle_name_input(self) -> None:
         action = self.name_input.get_name(
