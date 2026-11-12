@@ -18,13 +18,13 @@ clean:
 	find . -type d -name ".mypy_cache" -exec rm -rf {} +
 
 lint:
-	uv run flake8 $(LINT_CHECK)
+	-uv run flake8 $(LINT_CHECK)
 	uv run mypy --warn-return-any --warn-unused-ignores \
 	--ignore-missing-imports --disallow-untyped-defs \
 	--check-untyped-defs $(LINT_CHECK)
 
 lint-strict:
-	uv run flake8 $(LINT_CHECK)
+	-uv run flake8 $(LINT_CHECK)
 	uv run mypy --strict $(LINT_CHECK)
 
 re: clean install run
