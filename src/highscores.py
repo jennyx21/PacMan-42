@@ -106,7 +106,7 @@ class Leaderboard:
                 y_pos += 45
 
         footer = self.font_footer.render(
-            "Press any key to return to menu", True, (150, 150, 150))
+            "PRESS ANY KEY TO GO BACK TO MENU...", True, (150, 150, 150))
         screen.blit(footer, footer.get_rect(
             center=(width // 2, height - 50)))
 
@@ -145,7 +145,7 @@ class NameInput:
         screen.blit(text_surf, text_surf.get_rect(
             center=(width // 2, height // 2 + 20)))
         footer = self.font_footer.render(
-            "Press any key to proceed...", True, (150, 150, 150))
+            "PRESS ANY KEY TO CONTINUE...", True, (150, 150, 150))
         screen.blit(footer, footer.get_rect(
             center=(width // 2, height - 50)))
 
@@ -175,12 +175,12 @@ class NameInput:
                 center=(width // 2, height // 2 - 180)))
 
             text_surf = self.font_text.render(
-                "(max 10 characters)", True, (255, 255, 0))
+                "(MAX 10 CHARACTERS)", True, (255, 255, 0))
             screen.blit(text_surf, text_surf.get_rect(
                 center=(width // 2, height // 2 + 100)))
 
             score_surf = self.font_entry.render(
-                f"Score: {score}", True, (200, 200, 200))
+                f"SCORE: {score}", True, (200, 200, 200))
             screen.blit(score_surf, score_surf.get_rect(
                 center=(width // 2, height // 2 - 100)))
 
@@ -196,7 +196,7 @@ class NameInput:
                     center=(width // 2, height // 2 + 140)))
 
             footer = self.font_footer.render(
-                "Press ENTER to save, ESC to quit without saving your score",
+                "PRESS ENTER TO SAVE  |  ESC TO QUIT WITHOUT SAVING",
                 True, (150, 150, 150))
             screen.blit(footer, footer.get_rect(
                 center=(width // 2, height - 50)))
@@ -221,10 +221,11 @@ class NameInput:
                         msg = ""
                     else:
                         if not (event.unicode.isalnum() or event.unicode == " "):
-                            if event.unicode:  # only show error if a printable non-alnum key was pressed
-                                msg = "Enter only letters, numbers, and spaces :("
+                            if event.unicode:
+                                msg = "Uh oh, only letters, numbers, " \
+                                    "and spaces please"
                         elif len(name) >= 10:
-                            msg = "Maximum 10 characters :("
+                            msg = "Heyyyyy max 10 characters!"
                         else:
                             name += event.unicode
                             msg = ""

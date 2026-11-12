@@ -103,6 +103,8 @@ class DrawMaze:
                         game.update_start()
 
             start, pause = game.game_info()
+            font_pause = pg.font.Font(None, 64)
+            font_sub = pg.font.Font(None, 28)
 
             background.fill((15, 10, 40))
             field.fill((15, 10, 40))
@@ -172,6 +174,50 @@ class DrawMaze:
             if game.level_win:
                 outcome = "WIN"
                 running = False
+
+            # pinky.run_pinky()
+            # inky.run_inky()
+            # clyde.run_clyde()
+            self.screen.blit(background, background.get_rect())
+            self.screen.blit(field,
+                             field.get_rect(center=self.screen.
+                                            get_rect().center))
+
+            # dim screen before gstart, pause and game over
+            if not start:
+                overlay = pg.Surface(self.screen.get_size(), pg.SRCALPHA)
+                overlay.fill((0, 0, 0, 160))
+                self.screen.blit(overlay, (0, 0))
+
+                banner_surf = font_sub.render(
+                    "PRESS SPACE TO START", True, (255, 255, 0))
+                self.screen.blit(
+                    banner_surf,
+                    banner_surf.get_rect(center=(self.screen.get_width() // 2,
+                                                 self.screen.get_height() // 2)))
+            elif pause:
+                overlay = pg.Surface(self.screen.get_size(), pg.SRCALPHA)
+                overlay.fill((0, 0, 0, 160))
+                self.screen.blit(overlay, (0, 0))
+
+                pause_surf = font_pause.render("PAUSED", True, (255, 255, 0))
+                self.screen.blit(
+                    pause_surf,
+                    pause_surf.get_rect(center=(self.screen.get_width() // 2,
+                                                self.screen.get_height() // 2 - 25)))
+
+                resume_surf = font_sub.render(
+                    "PRESS SPACE TO RESUME", True, (200, 200, 200))
+                self.screen.blit(
+                    resume_surf,
+                    resume_surf.get_rect(center=(self.screen.get_width() // 2,
+                                                 self.screen.get_height() // 2 + 25)))
+                resume_surf = font_sub.render(
+                    " OR ESC TO EXIT", True, (200, 200, 200))
+                self.screen.blit(
+                    resume_surf,
+                    resume_surf.get_rect(center=(self.screen.get_width() // 2,
+                                                 self.screen.get_height() // 2 + 65)))
 
             pg.display.flip()
             clock.tick(60)

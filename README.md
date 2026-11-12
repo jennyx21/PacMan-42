@@ -121,6 +121,10 @@ Mazes are generated dynamically via `MazeLoader` (`src/maze_loader.py`) using th
   - `DrawMaze` (`src/drawmaze.py`) and `PacMan` (`src/pacman.py`) use bitwise AND (`cell & direction`) to render walls and check valid movement directions
 - **Fallback Handling:**
   - If the external `mazegenerator` wheel is missing, crashes, or returns a malformed grid, `MazeLoader` falls back to an internal fallback maze generator (`_fallback_maze`) so the game remains playable
+  - Algorithm (Prim's + Breaking extra walls):
+    - By using Prim's Algorithm with a frontier list of walls growing from the center, producing natural, balanced paths rather than long tunnels compared to DFS
+    - Then randomly removes 20% of remaining interior walls to turn dead ends into circular paths
+    - Finally, clears a 3×3 area in centre as spawn area for Pac-Man
 
 ### Implementation
 a technical summary of your implementation

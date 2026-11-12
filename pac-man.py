@@ -1,8 +1,6 @@
 import os
 import sys
 from src.parser import ConfigParser
-from src.maze_loader import MazeLoader, MazeLoaderError
-from src.drawmaze import DrawMaze
 from src.game_manager import GameManager
 
 
@@ -21,32 +19,9 @@ def run() -> None:
         with open(config_path, "r"):
             parser = ConfigParser(config_path)
             config = parser.parse()
-            # just for checking
-            print(config.__dict__)
     except FileNotFoundError:
         print(f"Error: File '{config_path}' not found.")
         sys.exit(1)
-
-    # # just for testing
-    # try:
-    #     level = config.levels[1]
-    #     maze_data = MazeLoader.load(
-    #         width=level.width,
-    #         height=level.height,
-    #         seed=config.seed,
-    #     )
-    #     print(f"\n\nmaze generated: {maze_data.width}x{maze_data.height}")
-
-    #     visualizer = DrawMaze(maze_data.grid,
-    #                           config.pacgum,
-    #                           4,
-    #                           config.points_per_pacgum,
-    #                           config.points_per_super_pacgum,
-    #                           config.lives)
-    #     visualizer.window()
-    # except MazeLoaderError as e:
-    #     print("MazeLoaderError:", e)
-    #     sys.exit(1)
 
     game = GameManager(config)
     game.run()
