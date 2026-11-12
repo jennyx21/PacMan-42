@@ -99,12 +99,10 @@ class DrawMaze:
                     elif event.key == pg.K_ESCAPE:
                         outcome = "BACK"
                         running = False
-                    elif event.key in (pg.K_SPACE, pg.K_KP_ENTER, pg.K_RETURN):
+                    elif event.key == pg.K_SPACE:
                         game.update_start()
 
             start, pause = game.game_info()
-            font_pause = pg.font.Font(None, 64)
-            font_sub = pg.font.Font(None, 28)
 
             background.fill((15, 10, 40))
             field.fill((15, 10, 40))
@@ -124,49 +122,6 @@ class DrawMaze:
             if game.start:
                 game.display_time()
 
-            # Dim screens on start or pause
-            if not start:
-                overlay = pg.Surface(self.screen.get_size(), pg.SRCALPHA)
-                overlay.fill((0, 0, 0, 160))
-                self.screen.blit(background, background.get_rect())
-                self.screen.blit(field,
-                                 field.get_rect(center=self.screen.
-                                                get_rect().center))
-                self.screen.blit(overlay, (0, 0))
-
-                banner_surf = font_sub.render(
-                    "PRESS SPACE TO START", True, (255, 255, 0))
-                self.screen.blit(
-                    banner_surf,
-                    banner_surf.get_rect(center=(self.screen.get_width() // 2,
-                                                 self.screen.get_height() // 2)))
-            elif pause:
-                overlay = pg.Surface(self.screen.get_size(), pg.SRCALPHA)
-                overlay.fill((0, 0, 0, 160))
-                self.screen.blit(background, background.get_rect())
-                self.screen.blit(field,
-                                 field.get_rect(center=self.screen.
-                                                get_rect().center))
-                self.screen.blit(overlay, (0, 0))
-
-                pause_surf = font_pause.render("PAUSED", True, (255, 255, 0))
-                self.screen.blit(
-                    pause_surf,
-                    pause_surf.get_rect(center=(self.screen.get_width() // 2,
-                                                self.screen.get_height() // 2 - 25)))
-
-                resume_surf = font_sub.render(
-                    "Press SPACE to Resume | ESC to Exit", True, (200, 200, 200))
-                self.screen.blit(
-                    resume_surf,
-                    resume_surf.get_rect(center=(self.screen.get_width() // 2,
-                                                 self.screen.get_height() // 2 + 25)))
-            else:
-                self.screen.blit(background, background.get_rect())
-                self.screen.blit(field,
-                                 field.get_rect(center=self.screen.
-                                                get_rect().center))
-
             if game.level_lost:
                 outcome = "LOSE"
                 running = False
@@ -175,15 +130,12 @@ class DrawMaze:
                 outcome = "WIN"
                 running = False
 
-            # pinky.run_pinky()
-            # inky.run_inky()
-            # clyde.run_clyde()
             self.screen.blit(background, background.get_rect())
             self.screen.blit(field,
                              field.get_rect(center=self.screen.
                                             get_rect().center))
 
-            # dim screen before gstart, pause and game over
+            # dim screen before start, pause and game over
             if not start:
                 overlay = pg.Surface(self.screen.get_size(), pg.SRCALPHA)
                 overlay.fill((0, 0, 0, 160))
@@ -204,7 +156,7 @@ class DrawMaze:
                 self.screen.blit(
                     pause_surf,
                     pause_surf.get_rect(center=(self.screen.get_width() // 2,
-                                                self.screen.get_height() // 2 - 25)))
+                                                 self.screen.get_height() // 2 - 25)))
 
                 resume_surf = font_sub.render(
                     "PRESS SPACE TO RESUME", True, (200, 200, 200))
