@@ -1,6 +1,7 @@
 import pygame
 import pygame_menu
 import pygame_menu.events
+from src.asset_helper import asset_loader
 
 
 class GameMenu:
@@ -9,10 +10,12 @@ class GameMenu:
             surface: pygame.Surface
     ) -> None:
         self.surface = surface
+        self.menue_backround = asset_loader("Menu", "start", 20)
+        self.current = 0
         self.width, self.height = surface.get_size()
 
         menutheme = pygame_menu.Theme(
-            background_color=(5, 0, 25),
+            background_color=(0, 0, 0, 0),
             widget_font_color=(200, 200, 200),
             selection_color=(255, 255, 0),
             widget_font_size=36,
@@ -60,6 +63,15 @@ class GameMenu:
         while self.menu.is_enabled():
             events = pygame.event.get()
             mapped_events = []
+            if self.current < len(self.menue_backround):
+                image = self.menue_backround[int(self.current)]
+                rect = image.get_rect()
+                self.current += 0.2
+            else:
+                self.current = 0
+                image = self.menue_backround[int(self.current)]
+                rect = image.get_rect()
+
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_w:
@@ -89,6 +101,7 @@ class GameMenu:
 
             self.menu.update(mapped_events)
             if self.menu.is_enabled():
+                self.surface.blit(image, rect)
                 self.menu.draw(self.surface)
             pygame.display.flip()
             clock.tick(60)
