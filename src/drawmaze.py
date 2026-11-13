@@ -38,6 +38,14 @@ class DrawMaze:
         self.level = level
         self.max_time = max_time
 
+    def _find_spawn_cell(self) -> tuple[int, int]:
+        row = len(self.maze) // 2
+        col = len(self.maze[0]) // 2
+        # 15 means 4 walls
+        while self.maze[row][col] == 15 and col > 1:
+            col -= 1
+        return col, row
+
     def window(self, screen: Surface | None = None, clock: pg.time.Clock | None = None) -> Results:
         standalone = screen is None
         if standalone:
@@ -57,7 +65,7 @@ class DrawMaze:
         whidth: int = 700
         height: int = 700
         cell_size = whidth / len(self.maze)
-        middle = len(self.maze) / 2
+        spawn_col, spawn_row = self._find_spawn_cell()
         background = pg.Surface((whidth + 2 * 50, height + 2 * 50))
         field = pg.Surface((whidth, height))
         game = Game(background, self.score, self.lives, self.level,
@@ -66,7 +74,7 @@ class DrawMaze:
                         game,
                         self.maze,
                         cell_size,
-                        (int(middle), int(middle)),
+                        (spawn_col, spawn_row),
                         self.lives)
         pacgum = Pacgum(field,
                         self.pacgum,
@@ -119,8 +127,8 @@ class DrawMaze:
             self.draw_walls(cell_size, field, (100, 90, 175), 8, 3)
             self.draw_walls(cell_size, field, (175, 170, 255), 3)
 
-            pacman.draw_pacman(int(middle * cell_size),
-                               int(middle * cell_size))
+            pacman.draw_pacman(int(spawn_col * cell_size),
+                               int(spawn_row * cell_size))
             pacgum.run_gums()
             blinky.run_blinky()
             pinky.run_pinky()
