@@ -1,6 +1,6 @@
 import pygame
 import pygame_menu
-import pygame_menu.events
+from typing import Optional
 
 
 class GameMenu:
@@ -27,7 +27,7 @@ class GameMenu:
             theme=menutheme
         )
         self.build_menu()
-        self.action = None
+        self.action: Optional[str] = None
 
     def build_menu(self) -> None:
         self.menu.add.label(
@@ -37,11 +37,16 @@ class GameMenu:
             margin=(0, 40),
         )
         self.menu.add.button('Play', self.play_function)
+        self.menu.add.button('Instructions', self.show_instructions)
         self.menu.add.button('Highscores', self.show_highscores)
         self.menu.add.button('Quit', self.quit_function)
 
     def play_function(self) -> None:
         self.action = "PLAY"
+        self.menu.disable()
+
+    def show_instructions(self) -> None:
+        self.action = "INSTRUCTIONS"
         self.menu.disable()
 
     def show_highscores(self) -> None:

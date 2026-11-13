@@ -5,6 +5,7 @@ from src.menu import GameMenu
 from src.drawmaze import DrawMaze, Results
 from src.maze_loader import MazeLoader, MazeLoaderError
 from src.parser import GameConfig
+from src.asset_helper import asset_loader
 
 
 class GameState(Enum):
@@ -12,6 +13,7 @@ class GameState(Enum):
     PLAYING = auto()
     NAME_INPUT = auto()
     HIGHSCORES = auto()
+    INSTRUCTIONS = auto()
     QUIT = auto()
 
 
@@ -27,6 +29,7 @@ class GameManager:
 
         # menu
         self.menu = GameMenu(self.screen)
+        # self.instruction = asset_loader()
 
         # resources
         self.config = config if config is not None else GameConfig()
@@ -50,6 +53,8 @@ class GameManager:
                 self._handle_name_input()
             elif self.state == GameState.HIGHSCORES:
                 self._handle_highscores()
+            # elif self.state == GameState.INSTRUCTIONS:
+            #     self._handle_instructions()
             elif self.state == GameState.QUIT:
                 self.running = False
 
@@ -110,6 +115,13 @@ class GameManager:
             self.running = False
         else:
             self.state = GameState.MENU
+
+    # def _handle_instructions(self) -> None:
+        # action = asset_loader(self.)
+        # if action == "QUIT":
+        #     self.running = False
+        # else:
+        #     self.state = GameState.MENU
 
 
 if __name__ == "__main__":
