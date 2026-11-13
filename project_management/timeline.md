@@ -21,10 +21,32 @@ For progress tracking and task cards, refer to our [Trello Board](https://trello
   - Start/pause mechanics (src/player_mechanics.py)
 
 ### Week 3:
-- ** Planned (Weng):**
-  - `MazeLoader` fallback generator (src/maze_loader.py)
+- **(Weng):**
+  - `MazeLoader` fallback generator DFS (src/maze_loader.py)
   - Merging gameplay loop (`DrawMaze`) into `GameManager._handle_playing`
   - Level progression and difficulty scaling (ghost speed, pacgum count, default levels fallback)
+- **(Jenny)**
+  - add a state to mark `Ghosts` as edible when superpacgum is eaten
+  - make a point system that can be sent as a int value to the highscore
+  - `Ghosts` edible by pacman and make them run away
+  - Implement a basic flee algorithm and the ghost classes "pinky, inky, and clyde"
+
+
+### Week 4:
+- **(Weng):**
+  - `MazeLoader` fallback generator algorithm change to Prim's and extra breaking walls (src/maze_loader.py)
+  - Fixing highscores.py to reject spaces only input
+  - Displays top3 on menu
+  - refactor DrawMaze class
+  - Makefile fix
+
+- **(Jenny)**
+  - ghosts are edible now
+  - implemented player lose lives
+  - display the score and the remaining lives. add the draw maze to the game manager
+  - implemented the cheat mode
+  - implement a timer and a timer bar that runs down
+
 
 ## Phases
 
