@@ -1,9 +1,9 @@
 from src.player_mechanics import Game
 from src.pacman import PacMan
 from src.asset_helper import asset_loader
-# from src.pacgum import Pacgum
 from pygame import Surface
 import pygame as pg
+import math
 
 
 UP = 1
@@ -132,11 +132,6 @@ class Ghosts(pg.sprite.Sprite):
         clyde.fill("orange")
         self.screen.blit(clyde, self.clyde_start)
 
-    def _detect_coaliton(self, rect):
-        if rect.colliderect(self.pacman):
-            return True
-        return False
-
     def flee_direction(self, col: int, row: int, old_direction: int):
         t_col, t_row = self.find_target()
         neightbors = self.neighbors(row, col)
@@ -181,9 +176,16 @@ class Ghosts(pg.sprite.Sprite):
         return direction, x, y
 
     def _detect_coaliton_ghosts(self, rect):
-        if rect.colliderect(self.pacman):
-            return True
-        return False
+        dist = math.hypot(self.x - self.pacman.x, self.y - self.pacman.y)
+        return dist < self.cell_size * 0.4
+
+    def vali_t(self, target: tuple[int, int]):
+        col, row = target
+        if row > len(self.maze) - 1 or row < 0 or col > len(self.maze) - 1 or col < 0:
+            return self.find_target()
+        if self.maze[row][col] == 15:
+            return self.find_target()
+        return col, row
 
 
 class Blinky(Ghosts):
@@ -202,7 +204,7 @@ class Blinky(Ghosts):
         self.y = self.cell_size / 2
         self.blinky_start = (self.x, self.y)
         self.direction = 0
-        self.speed = 1.2 + 10 / len(self.maze)
+        self.speed = 0.5 + 10 / len(self.maze)
         self.path: list = None
         self.edible = False
         self.edible_timer = 15000
@@ -247,6 +249,7 @@ class Blinky(Ghosts):
             self.current_sprite = self.sprite_edibleright
 
     def run_blinky(self):
+        self
         start, pause = self.game.game_info()
         if start:
             if not pause:
@@ -327,7 +330,7 @@ class Pinky(Ghosts):
         self.y = (len(self.maze) * self.cell_size) - (self.cell_size / 2)
         self.pinky_start = (self.x, self.y)
         self.direction = 0
-        self.speed = 1.2 + 10 / len(self.maze)
+        self.speed = 0.5 + 10 / len(self.maze)
         self.path: list = None
         self.edible = False
         self.edible_timer = 15000
@@ -387,10 +390,12 @@ class Pinky(Ghosts):
                     image = self.current_sprite[0]
                     rect = image.get_rect(center=(self.x, self.y))
                     self.speed = 1.2 + 10 / len(self.maze)
+                    t_col, t_row = self.pinky_target()
                     self.path, self.x, self.y = self.move(self.x, self.y,
                                                           self.direction,
                                                           self.speed,
-                                                          self.pinky_target(),
+                                                          self.vali_t((t_row,
+                                                                      t_col)),
                                                           self.path)
                     if self.game.signal and self.checked == 0:
                         self.edible = True
@@ -460,7 +465,7 @@ class Inky(Ghosts):
         self.y = self.cell_size / 2
         self.inky_start = (self.x, self.y)
         self.direction = 0
-        self.speed = 1.2 + 10 / len(self.maze)
+        self.speed = 0.5 + 10 / len(self.maze)
         self.path: list = None
         self.edible = False
         self.edible_timer = 15000
@@ -519,10 +524,12 @@ class Inky(Ghosts):
                     image = self.current_sprite[0]
                     rect = image.get_rect(center=(self.x, self.y))
                     self.speed = 1.2 + 10 / len(self.maze)
+                    t_col, t_row = self.inky_target()
                     self.path, self.x, self.y = self.move(self.x, self.y,
                                                           self.direction,
                                                           self.speed,
-                                                          self.inky_target(),
+                                                          self.vali_t((t_col,
+                                                                       t_row)),
                                                           self.path)
                     if self.game.signal and self.checked == 0:
                         self.edible = True
@@ -592,7 +599,7 @@ class Clyde(Ghosts):
         self.y = (len(self.maze) * self.cell_size) - (self.cell_size / 2)
         self.clyde_start = (self.x, self.y)
         self.direction = 0
-        self.speed = 1.2 + 10 / len(self.maze)
+        self.speed = 0.5 + 10 / len(self.maze)
         self.path: list = None
         self.edible = False
         self.edible_timer = 15000
@@ -653,10 +660,12 @@ class Clyde(Ghosts):
                     image = self.current_sprite[0]
                     rect = image.get_rect(center=(self.x, self.y))
                     self.speed = 1.2 + 10 / len(self.maze)
+                    t_col, t_row = self.clyde_target()
                     self.path, self.x, self.y = self.move(self.x, self.y,
                                                           self.direction,
                                                           self.speed,
-                                                          self.clyde_target(),
+                                                          self.vali_t((t_col,
+                                                                       t_row)),
                                                           self.path)
                     if self.game.signal and self.checked == 0:
                         self.edible = True
