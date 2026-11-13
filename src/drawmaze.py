@@ -94,13 +94,23 @@ class DrawMaze:
                     outcome = "QUIT"
                     running = False
                 elif event.type == pg.KEYDOWN:
-                    if event.key is pg.K_c:
+                    if event.key == pg.K_c:
                         game.turn_on_cheat()
                     elif event.key == pg.K_ESCAPE:
                         outcome = "BACK"
                         running = False
                     elif event.key == pg.K_SPACE:
                         game.update_start()
+                    elif game.cheat:
+                        if event.key is pg.K_t:
+                            game.cheat_mode("time")
+                        elif event.key is pg.K_l:
+                            game.cheat_mode("lives")
+                        elif event.key is pg.K_x:
+                            game.cheat_mode("return")
+                        elif event.key is pg.K_n:
+                            outcome = "WIN"
+                            running = False
 
             start, pause = game.game_info()
             game.reset_signal()

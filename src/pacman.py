@@ -94,7 +94,7 @@ class PacMan(pg.sprite.Sprite, Game):
         return 0
 
     def draw_pacman(self, x: int, y: int):
-        speed = 1.2 + 10 / len(self.maze)
+        speed = 1.8 + 10 / len(self.maze)
         col, row = self.current_cell()
         start, pause = self.game.game_info()
         if start is False:

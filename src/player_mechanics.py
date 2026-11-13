@@ -21,6 +21,7 @@ class Game():
         self.time = pg.time.get_ticks()
         self.level_win = False
         self.level_lost = False
+        self.cheat_time = False
 
         self.live_on_spirete = asset_loader("lives", "on", 20)
         self.live_off_spirete = asset_loader("lives", "off", 20)
@@ -108,11 +109,22 @@ class Game():
     def level_loose(self):
         self.level_lost = True
 
+    def cheat_mode(self, mode: str):
+        if mode == "lives":
+            self.pacman_lives = 3
+            self.live_list = self.rameining_lives()
+        elif mode == "time":
+            self.cheat_time = True
+        elif mode == "return":
+            print("hello")
+            self.cheat = False
+
     def display_time(self):
         time = pg.time.get_ticks()
-        if time < self.time + self.max_time * 1000:
-            remaining_time = self.time + self.max_time * 1000 - time
-            x = 700 * (remaining_time / (self.max_time * 1000))
-            pg.draw.line(self.screen, ("green"), (50, 775), (50 + x, 775), 25)
-        else:
-            self.level_loose()
+        if not self.cheat_time:
+            if time < self.time + self.max_time * 1000:
+                remaining_time = self.time + self.max_time * 1000 - time
+                x = 700 * (remaining_time / (self.max_time * 1000))
+                pg.draw.line(self.screen, ("green"), (50, 775), (50 + x, 775), 25)
+            else:
+                self.level_loose()

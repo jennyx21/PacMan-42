@@ -657,10 +657,9 @@ class Clyde(Ghosts):
 
     def clyde_target(self):
         col, row = self.find_target()
-        c_col, c_row = self.current_cell(self.x, self.y)
-        if abs(row - c_row) < 5 or abs(col - c_col) < 5:
-            row = len(self.maze)
-            col = len(self.maze)
+        col -= 2
+        if col < 0:
+            col += 4
         return col, row
 
 
