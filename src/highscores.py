@@ -9,6 +9,9 @@ class HighscoreRecord:
         self.scores: list[dict[str, Any]] = []
         self.load_file()
 
+    def _name_only_space(self, name: str) -> bool:
+        return name.isspace()
+
     def _name_is_valid(self, name: str) -> bool:
         if not name or len(name) > 10:
             return False
@@ -17,6 +20,8 @@ class HighscoreRecord:
                 continue
             else:
                 return False
+        if self._name_only_space(name):
+            return False
         return True
 
     def _score_is_valid(self, score: int) -> bool:
