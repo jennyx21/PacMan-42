@@ -37,6 +37,9 @@ class GameManager:
         self.leaderboard = Leaderboard(self.highscores)
         self.name_input = NameInput(self.highscores)
 
+        # menu
+        self.menu = GameMenu(self.screen, self.highscores)
+
         # current
         self.state = GameState.MENU
         self.current_score = 0
@@ -71,11 +74,17 @@ class GameManager:
 
     def _handle_playing(self) -> None:
         level = self.config.levels[0]
-        maze_data = MazeLoader.load(
-            width=level.width,
-            height=level.height,
-            seed=self.config.seed,
-        )
+        try:
+            maze_data = MazeLoader.load(
+                width=level.width,
+                height=level.height,
+                seed=self.config.seed,
+            )
+        except MazeLoaderError as e:
+            print(f"MazeLoaderError: {e}")
+            self.state = GameState.MENU
+            return
+
         game_loop = DrawMaze(
             maze=maze_data.grid,
             pacgum=self.config.pacgum,
