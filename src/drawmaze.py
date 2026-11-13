@@ -111,7 +111,7 @@ class DrawMaze:
                         game.update_start()
 
             start, pause = game.game_info()
-
+            game.reset_signal()
             background.fill((15, 10, 40))
             field.fill((15, 10, 40))
             self.draw_walls(cell_size, field, (100, 90, 175), 8, 3)

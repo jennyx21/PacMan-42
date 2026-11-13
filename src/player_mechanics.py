@@ -11,6 +11,7 @@ class Game():
         self.highscore = highscore
         self.signal = 0
         self.index = 0
+        self.live_lost = False
         self.cheat = False
         self.pacman_lives = lives
         self.live_list: list = self.rameining_lives()
@@ -57,6 +58,7 @@ class Game():
 
     def reset_signal(self):
         self.signal = 0
+        self.live_lost = False
 
     def update_edibility(self, edible_state: bool):
         if edible_state is False:
@@ -74,6 +76,7 @@ class Game():
         if self.pacman_lives > 0:
             self.pacman_lives -= 1
             self.live_list[self.live_list.index(1)] = 0
+            self.live_lost = True
         else:
             self.level_loose()
 

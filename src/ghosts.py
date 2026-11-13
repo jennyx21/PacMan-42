@@ -267,11 +267,15 @@ class Blinky(Ghosts):
                         self.checked = 1
                         self.time = pg.time.get_ticks() + self.edible_timer
 
-                    if self._detect_coaliton_ghosts(rect) and not self.game.cheat:
+                    if (self._detect_coaliton_ghosts(rect)
+                            and not self.game.cheat
+                            and not self.game.live_lost):
                         self.game.loose_lives()
                         row, col = self.pacman.start_cell
                         self.pacman.x, self.pacman.y = self.cell_center(row,
                                                                         col)
+                        self.x, self.y = self.blinky_start
+                    elif self.game.live_lost:
                         self.x, self.y = self.blinky_start
                     self.switch_sprite()
                 else:
@@ -402,11 +406,15 @@ class Pinky(Ghosts):
                         self.checked = 1
                         self.time = pg.time.get_ticks() + self.edible_timer
 
-                    if self._detect_coaliton_ghosts(rect) and not self.game.cheat:
+                    if (self._detect_coaliton_ghosts(rect)
+                            and not self.game.cheat
+                            and not self.game.live_lost):
                         self.game.loose_lives()
                         row, col = self.pacman.start_cell
                         self.pacman.x, self.pacman.y = self.cell_center(row,
                                                                         col)
+                        self.x, self.y = self.pinky_start
+                    elif self.game.live_lost:
                         self.x, self.y = self.pinky_start
                     self.switch_sprite()
                 else:
@@ -536,11 +544,15 @@ class Inky(Ghosts):
                         self.checked = 1
                         self.time = pg.time.get_ticks() + self.edible_timer
 
-                    if self._detect_coaliton_ghosts(rect) and not self.game.cheat:
+                    if (self._detect_coaliton_ghosts(rect)
+                            and not self.game.cheat
+                            and not self.game.live_lost):
                         self.game.loose_lives()
                         row, col = self.pacman.start_cell
                         self.pacman.x, self.pacman.y = self.cell_center(row,
                                                                         col)
+                        self.x, self.y = self.inky_start
+                    elif self.game.live_lost:
                         self.x, self.y = self.inky_start
                     self.switch_sprite()
                 else:
@@ -672,12 +684,17 @@ class Clyde(Ghosts):
                         self.checked = 1
                         self.time = pg.time.get_ticks() + self.edible_timer
 
-                    if self._detect_coaliton_ghosts(rect) and not self.game.cheat:
+                    if (self._detect_coaliton_ghosts(rect)
+                            and not self.game.cheat
+                            and not self.game.live_lost):
                         self.game.loose_lives()
                         row, col = self.pacman.start_cell
                         self.pacman.x, self.pacman.y = self.cell_center(row,
                                                                         col)
                         self.x, self.y = self.clyde_start
+                    elif self.game.live_lost:
+                        self.x, self.y = self.clyde_start
+
                     self.switch_sprite()
                 else:
                     if self.game.signal and self.checked == 0:
