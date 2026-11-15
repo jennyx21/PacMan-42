@@ -16,7 +16,6 @@ class MazeLoader:
     @staticmethod
     def load(width: int, height: int, seed: int = 0) -> MazeData:
         try:
-            # type: ignore[import-untyped]
             from mazegenerator.mazegenerator import MazeGenerator
         except ImportError as e:
             raise MazeLoaderError(

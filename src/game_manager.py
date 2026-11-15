@@ -2,11 +2,10 @@ import pygame as pg
 from enum import Enum, auto
 from src.highscores import HighscoreRecord, Leaderboard, NameInput
 from src.menu import GameMenu
-from src.drawmaze import DrawMaze, Results
+from src.drawmaze import DrawMaze
 from src.maze_loader import MazeLoader, MazeLoaderError
 from src.parser import GameConfig
 from pathlib import Path
-from src.asset_helper import asset_loader
 
 
 class GameState(Enum):
@@ -19,7 +18,8 @@ class GameState(Enum):
 
 
 class GameManager:
-    def __init__(self, config=None, width: int = 800, height: int = 800) -> None:
+    def __init__(self, config: GameConfig | None = None,
+                 width: int = 800, height: int = 800) -> None:
         # pygame
         pg.init()
         self.width = width
