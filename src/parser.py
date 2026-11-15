@@ -16,16 +16,16 @@ class LevelsConfig:
 
 def _default_levels() -> list[LevelsConfig]:
     return [
-        LevelsConfig(1, 12, 12),
-        LevelsConfig(2, 12, 12),
-        LevelsConfig(3, 12, 12),
-        LevelsConfig(4, 12, 12),
-        LevelsConfig(5, 12, 12),
-        LevelsConfig(6, 12, 12),
-        LevelsConfig(7, 12, 12),
-        LevelsConfig(8, 12, 12),
-        LevelsConfig(9, 12, 12),
-        LevelsConfig(10, 12, 12),
+        LevelsConfig(1, 15, 15),
+        LevelsConfig(2, 15, 15),
+        LevelsConfig(3, 15, 15),
+        LevelsConfig(4, 15, 15),
+        LevelsConfig(5, 15, 15),
+        LevelsConfig(6, 15, 15),
+        LevelsConfig(7, 15, 15),
+        LevelsConfig(8, 15, 15),
+        LevelsConfig(9, 15, 15),
+        LevelsConfig(10, 15, 15),
     ]
 
 

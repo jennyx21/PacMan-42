@@ -88,43 +88,43 @@ A demo of config.json:
             },
             {
                 "level": 3,
-                "width": 17,
-                "height": 17
+                "width": 15,
+                "height": 15
             },
             {
                 "level": 4,
-                "width": 17,
-                "height": 17
+                "width": 15,
+                "height": 15
             },
             {
                 "level": 5,
-                "width": 19,
-                "height": 19
+                "width": 15,
+                "height": 15
             },
             {
                 "level": 6,
-                "width": 19,
-                "height": 19
+                "width": 15,
+                "height": 15
             },
             {
                 "level": 7,
-                "width": 21,
-                "height": 21
+                "width": 15,
+                "height": 15
             },
             {
                 "level": 8,
-                "width": 23,
-                "height": 23
+                "width": 15,
+                "height": 15
             },
             {
                 "level": 9,
-                "width": 23,
-                "height": 23
+                "width": 15,
+                "height": 15
             },
             {
                 "level": 10,
-                "width": 25,
-                "height": 25
+                "width": 15,
+                "height": 15
             }
         ]
     }
