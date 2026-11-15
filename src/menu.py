@@ -23,8 +23,8 @@ class GameMenu:
             selection_color=(255, 255, 0),
             widget_font=pygame_menu.font.FONT_MUNRO,
             widget_font_size=44,
-            widget_margin=(0, 20),
-            widget_offset=(0, 80)
+            widget_margin=(0, 8),
+            widget_offset=(0, 100)
         )
         menutheme.title = False
 
@@ -43,14 +43,21 @@ class GameMenu:
         self.menu.add.label(
             " PAC MAN",
             font_name=pygame_menu.font.FONT_8BIT,
-            font_size=82,
+            font_size=88,
             margin=(0, 20),
         )
+        self.menu.add.label("", font_size=10, margin=(0, 10))
 
+        self.menu.add.button('Play', self.play_function)
+        self.menu.add.button('Instructions', self.show_instructions)
+        self.menu.add.button('Highscores', self.show_highscores)
+        self.menu.add.button('Quit', self.quit_function)
+        self.menu.add.label("", font_size=1, margin=(0, 10))
+        
         self.menu.add.label(
             "--- BEST RECORDS ---",
             font_color=(255, 255, 0),
-            font_size=24,
+            font_size=22,
             margin=(0, 5),
         )
 
@@ -69,22 +76,16 @@ class GameMenu:
                     name = entry.get("name", "Player")
                     score = entry.get("score", 0)
                     self.menu.add.label(
-                        f"{rank}. {name:<12}{score:<5}",
+                        f"{rank}. {name:<12}{score:>6}",
                         font_color=(220, 220, 220),
-                        font_size=20,
+                        font_size=18,
                         margin=(0, 2),
                     )
                 self.menu.add.label(
                     "(see more in highscores...)",
-                    font_size=14,
+                    font_size=16,
                     margin=(0, 5),
                 )
-        self.menu.add.label("", font_size=10, margin=(0, 10))
-
-        self.menu.add.button('Play', self.play_function)
-        self.menu.add.button('Instructions', self.show_instructions)
-        self.menu.add.button('Highscores', self.show_highscores)
-        self.menu.add.button('Quit', self.quit_function)
 
     def play_function(self) -> None:
         self.action = "PLAY"
