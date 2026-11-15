@@ -22,7 +22,7 @@ class Game():
         self.level_win = False
         self.level_lost = False
         self.cheat_time = False
-        self.ghosts_arrived = set()
+        self.ghosts_arrived: set[str] = set()
 
         self.live_on_spirete = asset_loader("lives", "on", 20)
         self.live_off_spirete = asset_loader("lives", "off", 20)

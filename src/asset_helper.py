@@ -1,4 +1,5 @@
 from pathlib import Path
+from pygame import Surface
 import pygame
 import re
 
@@ -8,7 +9,7 @@ def frame_number(path: Path) -> int:
     return int(match.group(1)) if match else 0
 
 
-def asset_loader(name: str, direction: str, size: int):
+def asset_loader(name: str, direction: str, size: int) -> list[Surface]:
     loaded_assets = []
     asset_dir = Path(f"src/assets/{name}_assets")
     files = sorted(asset_dir.glob(f"{name}_{direction}*.png"),

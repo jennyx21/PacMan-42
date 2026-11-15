@@ -94,7 +94,8 @@ class DrawMaze:
         return True, ""
 
     def _draw_overlays(self, start: bool, pause: bool,
-                       font_pause: pg.font.Font, font_sub: pg.font.Font) -> None:
+                       font_pause: pg.font.Font,
+                       font_sub: pg.font.Font) -> None:
         if not start:
             overlay = pg.Surface(self.screen.get_size(), pg.SRCALPHA)
             overlay.fill((0, 0, 0, 160))
@@ -115,22 +116,26 @@ class DrawMaze:
             self.screen.blit(
                 pause_surf,
                 pause_surf.get_rect(center=(self.screen.get_width() // 2,
-                                            self.screen.get_height() // 2 - 25)))
+                                            (self.screen.get_height()
+                                             // 2 - 25))))
 
             resume_surf = font_sub.render(
                 "PRESS SPACE TO RESUME", True, (200, 200, 200))
             self.screen.blit(
                 resume_surf,
                 resume_surf.get_rect(center=(self.screen.get_width() // 2,
-                                             self.screen.get_height() // 2 + 25)))
+                                             (self.screen.get_height()
+                                              // 2 + 25))))
             resume_surf = font_sub.render(
                 " OR ESC TO EXIT", True, (200, 200, 200))
             self.screen.blit(
                 resume_surf,
                 resume_surf.get_rect(center=(self.screen.get_width() // 2,
-                                             self.screen.get_height() // 2 + 65)))
+                                             (self.screen.get_height()
+                                              // 2 + 65))))
 
-    def window(self, screen: Surface | None = None, clock: pg.time.Clock | None = None) -> Results:
+    def window(self, screen: Surface | None = None,
+               clock: pg.time.Clock | None = None) -> Results:
         standalone = screen is None
         if standalone:
             pg.init()
