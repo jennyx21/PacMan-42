@@ -11,7 +11,6 @@ exe:
 		--collect-all pygame_menu \
 		--hidden-import mazegenerator.mazegenerator \
 		pac-man.py
-	cd dist && zip PacMan-linux.zip PacMan
 
 install:
 	uv sync

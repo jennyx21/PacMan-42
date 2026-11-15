@@ -238,17 +238,3 @@ class NameInput:
                             name += event.unicode
                             msg = ""
             clock.tick(60)
-
-
-if __name__ == "__main__":
-    hs = HighscoreRecord("highscores.json")
-    hs.load_file()
-    print()
-
-    hs.add_score("weng", 20)
-    hs.add_score("", 200)
-    hs.add_score("w", 50.6)  # type: ignore
-    hs.add_score("oooooooooooo", 10)
-    hs.save_to_file()
-    print("leaderboard:", hs.scores)
-    print()
