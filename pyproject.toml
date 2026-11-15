@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12,<3.14"
 dependencies = [
+    "mypy>=2.4.1",
     "pygame>=2.6.1",
     "pygame-menu>=4.5.2",
 ]
@@ -12,3 +13,8 @@ dependencies = [
 [[tool.mypy.overrides]]
     module = "mazegenerator.*"
     ignore_missing_imports = true
+
+[dependency-groups]
+dev = [
+    "pyinstaller>=6.22.3",
+]

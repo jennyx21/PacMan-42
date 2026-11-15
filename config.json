@@ -20,43 +20,43 @@
         },
         {
             "level": 3,
-            "width": 17,
-            "height": 17
+            "width": 12,
+            "height": 12
         },
         {
             "level": 4,
-            "width": 17,
-            "height": 17
+            "width": 12,
+            "height": 12
         },
         {
             "level": 5,
-            "width": 19,
-            "height": 19
+            "width": 12,
+            "height": 12
         },
         {
             "level": 6,
-            "width": 19,
-            "height": 19
+            "width": 12,
+            "height": 12
         },
         {
             "level": 7,
-            "width": 21,
-            "height": 21
+            "width": 12,
+            "height": 12
         },
         {
             "level": 8,
-            "width": 23,
-            "height": 23
+            "width": 12,
+            "height": 12
         },
         {
             "level": 9,
-            "width": 23,
-            "height": 23
+            "width": 12,
+            "height": 12
         },
         {
             "level": 10,
-            "width": 25,
-            "height": 25
+            "width": 12,
+            "height": 12
         }
     ]
 }

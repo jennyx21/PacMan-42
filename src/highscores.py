@@ -1,5 +1,6 @@
 import json
 from typing import Any
+import pygame as pg
 
 
 class HighscoreRecord:
@@ -7,6 +8,9 @@ class HighscoreRecord:
         self.filepath = filepath
         self.scores: list[dict[str, Any]] = []
         self.load_file()
+
+    def _name_only_space(self, name: str) -> bool:
+        return name.isspace()
 
     def _name_is_valid(self, name: str) -> bool:
         if not name or len(name) > 10:
@@ -16,14 +20,14 @@ class HighscoreRecord:
                 continue
             else:
                 return False
+        if self._name_only_space(name):
+            return False
         return True
 
     def _score_is_valid(self, score: int) -> bool:
-        if not isinstance(score, int):
+        if isinstance(score, bool) or not isinstance(score, int):
             return False
-        elif score < 0:
-            return False
-        return True
+        return score >= 0
 
     def load_file(self) -> None:
         try:
@@ -47,21 +51,22 @@ class HighscoreRecord:
         except (FileNotFoundError, json.JSONDecodeError):
             self.scores = []
         except Exception as e:
+            self.scores = []
             print(e)
             print("Failed to load the leaderboard :(")
 
     def add_score(self, name: str, score: int) -> None:
         max_scores = 10
         if not self._name_is_valid(name):
-            print("Name cannot be empty or longer than 10 characters :(")
+            # print("Name cannot be empty or longer than 10 characters :(")
             return
         if not self._score_is_valid(score):
-            print("Score can only be positive integers :(")
+            # print("Score can only be positive integers :(")
             return
         self.scores.append({"name": name, "score": score})
         self.scores.sort(key=lambda x: x.get("score", 0), reverse=True)
         self.scores = self.scores[:max_scores]
-        print("Your score is saved :)")
+        # print("Your score is saved :)")
 
     def save_to_file(self) -> None:
         try:
@@ -69,6 +74,168 @@ class HighscoreRecord:
                 json.dump(self.scores, f, indent=4)
         except Exception as e:
             print(e)
+
+
+class Leaderboard:
+    def __init__(self, record: HighscoreRecord) -> None:
+        self.record = record
+        self.font_title = pg.font.Font(None, 48)
+        self.font_entry = pg.font.Font(None, 36)
+        self.font_footer = pg.font.Font(None, 24)
+
+    def display(self, screen: pg.Surface, clock: pg.time.Clock) -> str:
+        self.record.load_file()
+        width, height = screen.get_size()
+
+        screen.fill((5, 0, 25))
+        title_surf = self.font_title.render(
+            "LEADERBOARD", True, (255, 255, 0))
+        screen.blit(title_surf, title_surf.get_rect(
+            center=(width // 2, 80)))
+
+        y_pos = 160
+        if not self.record.scores:
+            no_scores = self.font_entry.render(
+                "No scores yet!", True, (200, 200, 200))
+            screen.blit(no_scores, no_scores.get_rect(
+                center=(width // 2, y_pos)))
+        else:
+            for rank, entry in enumerate(self.record.scores[:10], start=1):
+                name = entry.get("name", "Unknown")
+                score = entry.get("score", 0)
+                text = f"{rank:2d}. {name:<12} {score:>6}"
+                surf = self.font_entry.render(
+                    text, True, (255, 255, 255))
+                screen.blit(surf, surf.get_rect(
+                    center=(width // 2, y_pos)))
+                y_pos += 45
+
+        footer = self.font_footer.render(
+            "PRESS ANY KEY TO GO BACK TO MENU...", True, (150, 150, 150))
+        screen.blit(footer, footer.get_rect(
+            center=(width // 2, height - 50)))
+
+        pg.display.flip()
+
+        while True:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    return "QUIT"
+                elif event.type == pg.KEYDOWN:
+                    return "BACK"
+
+            clock.tick(60)
+
+
+class NameInput:
+    def __init__(self, record: HighscoreRecord) -> None:
+        self.record = record
+        self.font_title = pg.font.Font(None, 48)
+        self.font_text = pg.font.Font(None, 40)
+        self.font_entry = pg.font.Font(None, 36)
+        self.font_footer = pg.font.Font(None, 24)
+
+    def score_saved(self,
+                    screen: pg.Surface,
+                    clock: pg.time.Clock) -> str:
+        width, height = screen.get_size()
+
+        screen.fill((5, 0, 25))
+        title_surf = self.font_title.render(
+            "NEW SCORE SAVED!", True, (255, 255, 0))
+        screen.blit(title_surf, title_surf.get_rect(
+            center=(width // 2, height // 2 - 60)))
+        text_surf = self.font_title.render(
+            "DID YOU MAKE IT TO THE TOP 10?", True, (255, 255, 0))
+        screen.blit(text_surf, text_surf.get_rect(
+            center=(width // 2, height // 2 + 20)))
+        footer = self.font_footer.render(
+            "PRESS ANY KEY TO CONTINUE...", True, (150, 150, 150))
+        screen.blit(footer, footer.get_rect(
+            center=(width // 2, height - 50)))
+
+        pg.display.flip()
+
+        while True:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    return "QUIT"
+                elif event.type == pg.KEYDOWN:
+                    return "BACK"
+            clock.tick(60)
+
+    def get_name(self,
+                 screen: pg.Surface,
+                 clock: pg.time.Clock,
+                 score: int = 0) -> str:
+        width, height = screen.get_size()
+        name = ""
+        msg = ""
+
+        while True:
+            screen.fill((5, 0, 25))
+            title_surf = self.font_title.render(
+                "ENTER YOUR NAME", True, (255, 255, 0))
+            screen.blit(title_surf, title_surf.get_rect(
+                center=(width // 2, height // 2 - 180)))
+
+            text_surf = self.font_text.render(
+                "(MAX 10 CHARACTERS)", True, (255, 255, 0))
+            screen.blit(text_surf, text_surf.get_rect(
+                center=(width // 2, height // 2 + 100)))
+
+            score_surf = self.font_entry.render(
+                f"SCORE: {score}", True, (200, 200, 200))
+            screen.blit(score_surf, score_surf.get_rect(
+                center=(width // 2, height // 2 - 100)))
+
+            name_surf = self.font_entry.render(
+                name + "_", True, (255, 255, 255))
+            screen.blit(name_surf, name_surf.get_rect(
+                center=(width // 2, height // 2)))
+
+            if msg:
+                msg_surf = self.font_footer.render(
+                    msg, True, (255, 0, 0))
+                screen.blit(msg_surf, msg_surf.get_rect(
+                    center=(width // 2, height // 2 + 140)))
+
+            footer = self.font_footer.render(
+                "PRESS ENTER TO SAVE  |  ESC TO QUIT WITHOUT SAVING",
+                True, (150, 150, 150))
+            screen.blit(footer, footer.get_rect(
+                center=(width // 2, height - 50)))
+            pg.display.flip()
+
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    return "QUIT"
+                elif event.type == pg.KEYDOWN:
+                    if event.key == pg.K_ESCAPE:
+                        return "BACK"
+                    elif event.key == pg.K_RETURN:
+                        if not self.record._name_is_valid(name):
+                            msg = "Name cannot be empty :("
+                        else:
+                            self.record.add_score(name, score)
+                            self.record.save_to_file()
+                            self.score_saved(screen, clock)
+                            return "SUBMIT"
+                    elif event.key == pg.K_BACKSPACE:
+                        name = name[:-1]
+                        msg = ""
+                    else:
+                        if not (event.unicode.isalnum()
+                                or event.unicode == " "):
+                            if event.unicode:
+                                msg = "Uh oh, only letters, numbers, " \
+                                    "and spaces please"
+                        elif len(name) >= 10:
+                            msg = "Heyyyyy max 10 characters!"
+                        else:
+                            name += event.unicode
+                            msg = ""
+            clock.tick(60)
 
 
 if __name__ == "__main__":

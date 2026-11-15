@@ -1,90 +1,253 @@
+from dataclasses import dataclass
 import pygame as pg
+from pygame import Surface
 from src.player_mechanics import Game
 from src.pacman import PacMan
+from src.pacgum import Pacgum
+from src.ghosts import Blinky, Pinky, Inky, Clyde
+
+
+@dataclass
+class Results():
+    outcome: str
+    score: int
+    lives: int
 
 
 class DrawMaze:
-    def __init__(self, maze: list[list[int]]):
+    def __init__(self, maze: list[list[int]],
+                 pacgum: int,
+                 superpacgum: int,
+                 points_pg: int,
+                 points_spg: int,
+                 points_ghost: int,
+                 lives: int,
+                 max_time: int = 90,
+                 screen: Surface | None = None,
+                 score: int = 0,
+                 level: int = 1):
         self.maze = maze
+        self.pacgum = pacgum
+        self.superpacgum = superpacgum
+        self.points_pacgum = points_pg
+        self.points_super_pacgum = points_spg
+        self.points_ghost = points_ghost
+        self.lives = lives
+        self.score = score
+        self.level = level
+        self.max_time = max_time
 
-    def window(self):
-        pg.init()
-        clock = pg.time.Clock()
-        whidth: int = 800
-        height: int = 800
+        if screen is None:
+            raise RuntimeError()
+        self.screen: Surface = screen
+
+    def _find_spawn_cell(self) -> tuple[int, int]:
+        row = len(self.maze) // 2
+        col = len(self.maze[0]) // 2
+        # 15 means 4 walls
+        while self.maze[row][col] == 15 and col > 1:
+            col -= 1
+        return col, row
+
+    def _init_entities(self, field: Surface, background: Surface,
+                       cell_size: float,
+                       spawn_col: int,
+                       spawn_row: int) -> tuple[Game, PacMan, Pacgum,
+                                                Blinky, Pinky, Inky, Clyde]:
+        game = Game(background, self.score, self.lives, self.level,
+                    self.max_time)
+        pacman = PacMan(field,
+                        game,
+                        self.maze,
+                        cell_size,
+                        (spawn_col, spawn_row),
+                        self.lives)
+        pacgum = Pacgum(field,
+                        self.pacgum,
+                        self.superpacgum,
+                        self.points_pacgum,
+                        self.points_super_pacgum,
+                        self.maze,
+                        cell_size,
+                        pacman,
+                        game)
+        blinky = Blinky(field, cell_size, self.maze, pacman, game)
+        pinky = Pinky(field, cell_size, self.maze, pacman, game)
+        inky = Inky(field, cell_size, self.maze, pacman, game)
+        clyde = Clyde(field, cell_size, self.maze, pacman, game)
+        return game, pacman, pacgum, blinky, pinky, inky, clyde
+
+    def _handle_events(self, game: Game) -> tuple[bool, str]:
+        for event in pg.event.get():
+            if event.type is pg.QUIT:
+                return False, "QUIT"
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_c:
+                    game.turn_on_cheat()
+                elif event.key == pg.K_ESCAPE:
+                    return False, "BACK"
+                elif event.key == pg.K_SPACE:
+                    game.update_start()
+                elif game.cheat:
+                    if event.key is pg.K_t:
+                        game.cheat_mode("time")
+                    elif event.key is pg.K_l:
+                        game.cheat_mode("lives")
+                    elif event.key is pg.K_x:
+                        game.cheat_mode("return")
+                    elif event.key is pg.K_n:
+                        return False, "WIN"
+        return True, ""
+
+    def _draw_overlays(self, start: bool, pause: bool,
+                       font_pause: pg.font.Font,
+                       font_sub: pg.font.Font) -> None:
+        if not start:
+            overlay = pg.Surface(self.screen.get_size(), pg.SRCALPHA)
+            overlay.fill((0, 0, 0, 160))
+            self.screen.blit(overlay, (0, 0))
+
+            banner_surf = font_sub.render(
+                "PRESS SPACE TO START", True, (255, 255, 0))
+            self.screen.blit(
+                banner_surf,
+                banner_surf.get_rect(center=(self.screen.get_width() // 2,
+                                             self.screen.get_height() // 2)))
+        elif pause:
+            overlay = pg.Surface(self.screen.get_size(), pg.SRCALPHA)
+            overlay.fill((0, 0, 0, 160))
+            self.screen.blit(overlay, (0, 0))
+
+            pause_surf = font_pause.render("PAUSED", True, (255, 255, 0))
+            self.screen.blit(
+                pause_surf,
+                pause_surf.get_rect(center=(self.screen.get_width() // 2,
+                                            (self.screen.get_height()
+                                             // 2 - 25))))
+
+            resume_surf = font_sub.render(
+                "PRESS SPACE TO RESUME", True, (200, 200, 200))
+            self.screen.blit(
+                resume_surf,
+                resume_surf.get_rect(center=(self.screen.get_width() // 2,
+                                             (self.screen.get_height()
+                                              // 2 + 25))))
+            resume_surf = font_sub.render(
+                " OR ESC TO EXIT", True, (200, 200, 200))
+            self.screen.blit(
+                resume_surf,
+                resume_surf.get_rect(center=(self.screen.get_width() // 2,
+                                             (self.screen.get_height()
+                                              // 2 + 65))))
+
+    def window(self, screen: Surface | None = None,
+               clock: pg.time.Clock | None = None) -> Results:
+        whidth: int
+        height: int
+        standalone = screen is None
+        if standalone:
+            pg.init()
+            clock = pg.time.Clock()
+            whidth = 700
+            height = 700
+            self.screen = pg.display.set_mode(
+                (whidth + 2 * 50, height + 2 * 50))
+            pg.display.set_caption("Pac Man")
+        elif screen is not None:
+            self.screen = screen
+
+        if clock is None:
+            clock = pg.time.Clock()
+
+        whidth = 700
+        height = 700
         cell_size = whidth / len(self.maze)
-        screen = pg.display.set_mode((whidth, height))
-        pg.display.set_caption("Pac Man")
-        game = Game()
-        pacman = PacMan(screen, game)
+        spawn_col, spawn_row = self._find_spawn_cell()
+        background = pg.Surface((whidth + 2 * 50, height + 2 * 50))
+        field = pg.Surface((whidth, height))
+
+        (game, pacman, pacgum,
+         blinky, pinky, inky, clyde) = self._init_entities(
+             field, background, cell_size, spawn_col, spawn_row)
+
+        font_pause = pg.font.Font(None, 64)
+        font_sub = pg.font.Font(None, 28)
         running = True
+        outcome = "QUIT"
 
         while running:
-            for event in pg.event.get():
-                if event.type is pg.QUIT:
-                    running = False
+            running, event_outcome = self._handle_events(game)
+            if not running:
+                outcome = event_outcome
+                break
 
-            keys = pg.key.get_pressed()
-            if keys[pg.K_ESCAPE]:
-                running = False
-            if keys[pg.K_SPACE] or keys[pg.K_KP_ENTER]:
-                game.update_start()
+            start, pause = game.game_info()
+            game.reset_signal()
+            background.fill((15, 10, 40))
+            field.fill((15, 10, 40))
+            self.draw_walls(cell_size, field, (100, 90, 175), 8, 3)
+            self.draw_walls(cell_size, field, (175, 170, 255), 3)
 
-            screen.fill((5, 0, 25))
-            x = 0
-            y = 0
-            i = 0
-            for a in range(len(self.maze)):
-                for b in range(len(self.maze[i])):
-                    cell = self.maze[b][a]
-                    x = b * cell_size
-                    y = a * cell_size
-                    if cell & 1:
-                        pg.draw.line(screen, (100, 90, 175), (y - 3, x),
-                                     (y + cell_size + 3, x), 8)
-                    if cell & 2:
-                        pg.draw.line(screen, (100, 90, 175),
-                                     (y + cell_size, x - 3),
-                                     (y + cell_size, x + cell_size + 3), 8)
-                    if cell & 4:
-                        pg.draw.line(screen, (100, 90, 175),
-                                     (y, x + cell_size),
-                                     (y + cell_size, x + cell_size), 8)
-                    if cell & 8:
-                        pg.draw.line(screen, (100, 90, 175),
-                                     (y, x), (y, x + cell_size), 8)
-                i += 1
+            pacman.draw_pacman()
+            pacgum.run_gums()
+            blinky.run_blinky()
+            pinky.run_pinky()
+            inky.run_inky()
+            clyde.run_clyde()
+            game.display_highscore()
+            game.diplay_lives()
+            game.display_Level()
+            if game.start:
+                game.display_time()
 
-            x = 0
-            y = 0
-            i = 0
-            for a in range(len(self.maze)):
-                for b in range(len(self.maze[i])):
-                    cell = self.maze[b][a]
-                    x = b * cell_size
-                    y = a * cell_size
-                    if cell & 1:
-                        pg.draw.line(screen, (175, 170, 255), (y, x),
-                                     (y + cell_size, x), 2)
-                    if cell & 2:
-                        pg.draw.line(screen, (175, 170, 255),
-                                     (y + cell_size, x),
-                                     (y + cell_size, x + cell_size), 2)
-                    if cell & 4:
-                        pg.draw.line(screen, (175, 170, 255),
-                                     (y, x + cell_size),
-                                     (y + cell_size, x + cell_size), 2)
-                    if cell & 8:
-                        pg.draw.line(screen, (175, 170, 255),
-                                     (y, x), (y, x + cell_size), 2)
-                i += 1
-            pacman.draw_pacman(int(((len(self.maze) // 2) * cell_size) +
-                               cell_size / 6),
-                               int(((len(self.maze) // 2) * cell_size)) +
-                               cell_size / 6)
+            if game.level_lost:
+                outcome = "LOSE"
+                break
+
+            if game.level_win:
+                outcome = "WIN"
+                break
+
+            self.screen.blit(background, background.get_rect())
+            self.screen.blit(field,
+                             field.get_rect(center=self.screen.
+                                            get_rect().center))
+
+            self._draw_overlays(start, pause, font_pause, font_sub)
 
             pg.display.flip()
             clock.tick(60)
-    pg.quit()
 
-    def walls()
+        if standalone:
+            pg.quit()
+
+        return Results(outcome, game.highscore, game.pacman_lives)
+
+    def draw_walls(self,
+                   cell_size: float,
+                   screen: Surface,
+                   color: tuple[int, int, int],
+                   size: int,
+                   length: int = 0) -> None:
+        x: float = 0
+        y: float = 0
+        for a in range(len(self.maze)):
+            for b in range(len(self.maze[a])):
+                cell = self.maze[b][a]
+                x = b * cell_size
+                y = a * cell_size
+                if cell & 1:
+                    pg.draw.line(screen, color, (y - length, x),
+                                 (y + cell_size + length, x), size)
+                if cell & 2:
+                    pg.draw.line(screen, color,
+                                 (y + cell_size, x - length),
+                                 (y + cell_size, x + cell_size + length), size)
+                if cell & 4:
+                    pg.draw.line(screen, color,
+                                 (y, x + cell_size),
+                                 (y + cell_size, x + cell_size), size)
+                if cell & 8:
+                    pg.draw.line(screen, color,
+                                 (y, x), (y, x + cell_size), size)
+        return

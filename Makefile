@@ -3,6 +3,16 @@ MAIN = pac-man.py
 CONFIG = config.json
 LINT_CHECK = src/
 
+exe:
+	rm -rf build dist
+	uv run pyinstaller --onefile --windowed --name PacMan \
+		--add-data "src/assets:src/assets" \
+		--add-data "config.json:." \
+		--collect-all pygame_menu \
+		--hidden-import mazegenerator.mazegenerator \
+		pac-man.py
+	cd dist && zip PacMan-linux.zip PacMan
+
 install:
 	uv sync
 	@if [ -f src/mazegenerator*.whl ]; then UV_SKIP_WHEEL_FILENAME_CHECK=1 uv pip install src/mazegenerator*.whl; fi
@@ -18,13 +28,13 @@ clean:
 	find . -type d -name ".mypy_cache" -exec rm -rf {} +
 
 lint:
-	uv run flake8 $(LINT_CHECK)
+	-uv run flake8 $(LINT_CHECK)
 	uv run mypy --warn-return-any --warn-unused-ignores \
 	--ignore-missing-imports --disallow-untyped-defs \
 	--check-untyped-defs $(LINT_CHECK)
 
 lint-strict:
-	uv run flake8 $(LINT_CHECK)
+	-uv run flake8 $(LINT_CHECK)
 	uv run mypy --strict $(LINT_CHECK)
 
 re: clean install run

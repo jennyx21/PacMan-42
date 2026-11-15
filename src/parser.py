@@ -10,8 +10,23 @@ class ConfigError(Exception):
 @dataclass
 class LevelsConfig:
     level_id: int = 1
-    width: int = 20
-    height: int = 20
+    width: int = 12
+    height: int = 12
+
+
+def _default_levels() -> list[LevelsConfig]:
+    return [
+        LevelsConfig(1, 12, 12),
+        LevelsConfig(2, 12, 12),
+        LevelsConfig(3, 12, 12),
+        LevelsConfig(4, 12, 12),
+        LevelsConfig(5, 12, 12),
+        LevelsConfig(6, 12, 12),
+        LevelsConfig(7, 12, 12),
+        LevelsConfig(8, 12, 12),
+        LevelsConfig(9, 12, 12),
+        LevelsConfig(10, 12, 12),
+    ]
 
 
 @dataclass
@@ -25,7 +40,7 @@ class GameConfig:
     points_per_super_pacgum: int = 50
     points_per_ghost: int = 200
     levels: list[LevelsConfig] = field(
-        default_factory=lambda: [LevelsConfig()])
+        default_factory=_default_levels)
 
 
 class ConfigParser:
