@@ -50,6 +50,8 @@ class HighscoreRecord:
 
         except (FileNotFoundError, json.JSONDecodeError):
             self.scores = []
+            print("Couldn't load existing scores on the leaderboard. "
+                  "Play and make new highscore records :)")
         except Exception as e:
             self.scores = []
             print(e)

@@ -16,7 +16,7 @@ class Game():
         self.live_lost = False
         self.cheat = False
         self.pacman_lives = lives
-        self.live_list: list = self.rameining_lives()
+        self.live_list: list[int] = self.rameining_lives()
         self.screen = screen
         self.level = level
         self.max_time = max_time

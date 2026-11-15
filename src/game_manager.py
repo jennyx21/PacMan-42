@@ -5,7 +5,6 @@ from src.menu import GameMenu
 from src.drawmaze import DrawMaze
 from src.maze_loader import MazeLoader, MazeLoaderError
 from src.parser import GameConfig
-from pathlib import Path
 
 
 class GameState(Enum):
@@ -65,7 +64,7 @@ class GameManager:
             self.state = GameState.PLAYING
         elif action == "HIGHSCORES":
             self.state = GameState.HIGHSCORES
-        elif action == "INSTRUCTION":
+        elif action == "INSTRUCTIONS":
             self.state = GameState.INSTRUCTIONS
         else:
             self.state = GameState.QUIT
@@ -167,10 +166,11 @@ class GameManager:
 
         for idx, level_cfg in enumerate(self.config.levels):
             try:
+                seed = self.config.seed if idx == 0 else 0
                 maze_data = MazeLoader.load(
                     width=level_cfg.width,
                     height=level_cfg.height,
-                    seed=self.config.seed + idx,
+                    seed=seed,
                 )
             except MazeLoaderError as e:
                 print(f"MazeLoaderError: {e}")
@@ -242,20 +242,28 @@ class GameManager:
             self.state = GameState.MENU
 
     def _handle_instructions(self) -> None:
-        asset_dir = Path("src/assets/instruction_assets")
-        instructions = pg.image.load(asset_dir, "instruction")
-        rules = pg.image.load(asset_dir, "rules")
-        self.screen.blit(instructions, (0, 0))
-        events = pg.event.get()
-        for event in events:
-            if event.type == pg.QUIT:
-                action = "QUIT"
-            if event.type == pg.KEYDOWN:
-                self.screen.blit(rules, (0, 0))
-        if action == "QUIT":
-            self.running = False
-        else:
-            self.state = GameState.MENU
+        controls = pg.image.load(
+            "src/assets/instruction_assets/instruction.png")
+        rules = pg.image.load("src/assets/instruction_assets/rules.png")
+
+        for page in (controls, rules):
+            self.screen.blit(page, (0, 0))
+            pg.display.flip()
+
+            read = False
+            while self.running and not read:
+                for event in pg.event.get():
+                    if event.type == pg.QUIT:
+                        self.running = False
+                        return
+                    elif event.type == pg.KEYDOWN:
+                        if event.key == pg.K_ESCAPE:
+                            self.state = GameState.MENU
+                            return
+                        elif event.key in (pg.K_SPACE, pg.K_RETURN):
+                            read = True
+                self.clock.tick(60)
+        self.state = GameState.MENU
 
 
 if __name__ == "__main__":

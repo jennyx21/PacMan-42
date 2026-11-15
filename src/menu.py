@@ -9,7 +9,7 @@ class GameMenu:
     def __init__(
             self,
             surface: pygame.Surface,
-            highscores: "HighscoreRecord | None" = None
+            highscores: Optional[HighscoreRecord] = None
     ) -> None:
         self.surface = surface
         self.menue_backround = asset_loader("Menu", "start", 20)
