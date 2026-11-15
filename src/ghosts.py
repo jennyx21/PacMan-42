@@ -297,6 +297,8 @@ class Blinky(Ghosts):
                         rect = image.get_rect(center=(self.x, self.y))
                     if self.time <= pg.time.get_ticks():
                         self.edible = False
+                    if self.game.live_lost:
+                        self.game.ghosts_arrived.add("blinky")
                     self.speed = 1 + 10 / len(self.maze)
                     self.direction, self.x, self.y = self.run(self.x,
                                                               self.y,
@@ -436,6 +438,8 @@ class Pinky(Ghosts):
                         rect = image.get_rect(center=(self.x, self.y))
                     if self.time <= pg.time.get_ticks():
                         self.edible = False
+                    if self.game.live_lost:
+                        self.game.ghosts_arrived.add("pinky")
                     self.speed = 1 + 10 / len(self.maze)
                     self.direction, self.x, self.y = self.run(self.x,
                                                               self.y,
@@ -575,6 +579,8 @@ class Inky(Ghosts):
                         rect = image.get_rect(center=(self.x, self.y))
                     if self.time <= pg.time.get_ticks():
                         self.edible = False
+                    if self.game.live_lost:
+                        self.game.ghosts_arrived.add("inky")
                     self.speed = 1 + 10 / len(self.maze)
                     self.direction, self.x, self.y = self.run(self.x,
                                                               self.y,
@@ -715,6 +721,8 @@ class Clyde(Ghosts):
                         rect = image.get_rect(center=(self.x, self.y))
                     if self.time <= pg.time.get_ticks():
                         self.edible = False
+                    if self.game.live_lost:
+                         self.game.ghosts_arrived.add("clyde")
                     self.speed = 1 + 10 / len(self.maze)
                     self.direction, self.x, self.y = self.run(self.x,
                                                               self.y,

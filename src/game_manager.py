@@ -5,6 +5,7 @@ from src.menu import GameMenu
 from src.drawmaze import DrawMaze, Results
 from src.maze_loader import MazeLoader, MazeLoaderError
 from src.parser import GameConfig
+from pathlib import Path
 from src.asset_helper import asset_loader
 
 
@@ -57,8 +58,8 @@ class GameManager:
                 self._handle_name_input()
             elif self.state == GameState.HIGHSCORES:
                 self._handle_highscores()
-            # elif self.state == GameState.INSTRUCTIONS:
-            #     self._handle_instructions()
+            elif self.state == GameState.INSTRUCTIONS:
+                self._handle_instructions()
             elif self.state == GameState.QUIT:
                 self.running = False
 
@@ -70,10 +71,14 @@ class GameManager:
             self.state = GameState.PLAYING
         elif action == "HIGHSCORES":
             self.state = GameState.HIGHSCORES
+        elif action == "INSTRUCTION":
+            self.state = GameState.INSTRUCTIONS
         else:
             self.state = GameState.QUIT
 
     def _handle_playing(self) -> None:
+        self.current_lives = self.config.lives
+        self.current_score = 0
         for i in range(10):
             if self.running:
                 level = self.config.levels[i]
@@ -132,12 +137,21 @@ class GameManager:
         else:
             self.state = GameState.MENU
 
-    # def _handle_instructions(self) -> None:
-        # action = asset_loader(self.)
-        # if action == "QUIT":
-        #     self.running = False
-        # else:
-        #     self.state = GameState.MENU
+    def _handle_instructions(self) -> None:
+        asset_dir = Path("src/assets/instruction_assets")
+        instructions = pg.image.load(asset_dir, "instruction")
+        rules = pg.image.load(asset_dir, "rules")
+        self.screen.blit(instructions, (0, 0))
+        events = pg.event.get()
+        for event in events:
+            if event.type == pg.QUIT:
+                action = "QUIT"
+            if event.type == pg.KEYDOWN:
+                self.screen.blit(rules, (0, 0))
+        if action == "QUIT":
+            self.running = False
+        else:
+            self.state = GameState.MENU
 
 
 if __name__ == "__main__":
