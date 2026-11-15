@@ -251,3 +251,13 @@ We track progress, weekly sprints, and task division in the [project_management/
 - [Trello Board](https://trello.com/b/Z480iQSZ/to-dos): Sprint to-dos and task cards
 
 ### Resources
+- [Python whl](https://opensource.com/article/23/1/packaging-python-modules-wheels)
+- [pygame-menu guide](https://gamedevacademy.org/pygame-menu-tutorial-complete-guide/)
+- [pygame-menu create menu](https://coderslegacy.com/python/create-menu-screens-in-pygame-tutorial/)
+- [pygame screen blit vs flip](https://realpython.com/lessons/using-blit-and-flip/)
+
+### AI usage:
+- we used AI to explore python and pygame functions
+- to explain errors and debug
+- to explain when stuck at some points
+- to structure sentences better for README

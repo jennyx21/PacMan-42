@@ -16,7 +16,7 @@ For progress tracking and task cards, refer to our [Trello Board](https://trello
 - **Weng:**
   - `HighscoreRecord` JSON persistence and validation (src/highscores.py)
   - Interactive Pygame `Leaderboard` and `NameInput` screens with live input validation and `score_saved` confirmation
-  - `GameManager` state machine (`MENU` -> `PLAYING` -> `NAME_INPUT` -> `HIGHSCORES` -> `QUIT`) in src/game_manager.py
+  - `GameManager` state machine (MENU -> PLAYING -> NAME_INPUT -> HIGHSCORES -> QUIT`) in src/game_manager.py
   - Custom arcade styling for `GameMenu` (src/menu.py)
   - Project documentation and project management tracking (README.md, project_management/)
 - **Jenny:**
@@ -39,23 +39,27 @@ For progress tracking and task cards, refer to our [Trello Board](https://trello
 - **Weng:**
   - Change `MazeLoader` fallback generator algorithm first and then decided not to put a fallback maze (src/maze_loader.py)
   - Fix highscores.py to reject spaces-only input
-  - Display top 3 on menu
-  - Makefile fix
+  - Display top 3 on main menu
+  - Makefile fix (lint and lint-strict)
   - Refactor `DrawMaze` class
+  - Add an instruction page to menu
 - **Jenny:**
   - `Ghosts` are edible now
   - Implemented player lose lives
   - Display score and remaining lives, and add draw maze to game manager
   - Implemented cheat mode
-  - Implement timer and timer bar that runs down
+  - Implemented timer and timer bar that runs down
+  - Drawing the main menu and instruction pages
   - Animated menu
+  - FIxes for Mypy and flake8
+  - Publish on Itch.io
 
 ## Phases
 
 1. **Phase 1 — Setup & Data Layer:** Repository structure, `ConfigParser`, `MazeLoader`, `HighscoreRecord`
 2. **Phase 2 — Core Rendering & UI Screens:** `DrawMaze`, `PacMan` controls, `GameMenu` design, `Leaderboard`, `NameInput`, `GameManager` state loop
 3. **Phase 3 — Gameplay Mechanics & Fallback Robustness:** Ghost AI/movement, pacgum scoring, `MazeLoader` fallback grid, default level configs
-4. **Phase 4 — Full Integration & Polish:** Connecting `DrawMaze` into `GameManager._handle_playing`, multi-level progression, final testing & documentation
+4. **Phase 4 — Full Integration & Polish:** Connecting `DrawMaze` into `GameManager._handle_playing`, multi-level progression, final testing & documentation, package the game and launch on a public platform (we chose Itch.io)
 
 ## Planned vs Actual
 
