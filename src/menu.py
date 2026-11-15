@@ -1,8 +1,8 @@
 import pygame
 import pygame_menu
+from src.asset_helper import asset_loader
 from src.highscores import HighscoreRecord
 from typing import Optional
-from src.asset_helper import asset_loader
 
 
 class GameMenu:
@@ -12,17 +12,19 @@ class GameMenu:
             highscores: "HighscoreRecord | None" = None
     ) -> None:
         self.surface = surface
-        self.highscores = highscores
         self.menue_backround = asset_loader("Menu", "start", 20)
         self.current = 0
+        self.highscores = highscores
         self.width, self.height = surface.get_size()
 
         menutheme = pygame_menu.Theme(
             background_color=(0, 0, 0, 0),
             widget_font_color=(200, 200, 200),
             selection_color=(255, 255, 0),
-            widget_font_size=36,
-            widget_margin=(0, 15)
+            widget_font=pygame_menu.font.FONT_MUNRO,
+            widget_font_size=44,
+            widget_margin=(0, 8),
+            widget_offset=(0, 100)
         )
         menutheme.title = False
 
@@ -30,7 +32,8 @@ class GameMenu:
             width=self.width,
             height=self.height,
             title="PAC-MAN",
-            theme=menutheme
+            theme=menutheme,
+            center_content=False
         )
         self.build_menu()
         self.action: Optional[str] = None
@@ -38,16 +41,23 @@ class GameMenu:
     def build_menu(self) -> None:
         self.menu.clear()
         self.menu.add.label(
-            "PAC-MAN",
-            font_color=(255, 255, 0),
-            font_size=64,
-            margin=(0, 25),
+            " PAC MAN",
+            font_name=pygame_menu.font.FONT_8BIT,
+            font_size=88,
+            margin=(0, 20),
         )
+        self.menu.add.label("", font_size=10, margin=(0, 10))
 
+        self.menu.add.button('Play', self.play_function)
+        self.menu.add.button('Instructions', self.show_instructions)
+        self.menu.add.button('Highscores', self.show_highscores)
+        self.menu.add.button('Quit', self.quit_function)
+        self.menu.add.label("", font_size=1, margin=(0, 10))
+        
         self.menu.add.label(
             "--- BEST RECORDS ---",
             font_color=(255, 255, 0),
-            font_size=24,
+            font_size=22,
             margin=(0, 5),
         )
 
@@ -58,7 +68,7 @@ class GameMenu:
                 self.menu.add.label(
                     "No scores yet!",
                     font_color=(150, 150, 150),
-                    font_size=20,
+                    font_size=16,
                     margin=(0, 2),
                 )
             else:
@@ -66,22 +76,16 @@ class GameMenu:
                     name = entry.get("name", "Player")
                     score = entry.get("score", 0)
                     self.menu.add.label(
-                        f"{rank}. {name:<12}{score:<5}",
+                        f"{rank}. {name:<12}{score:>6}",
                         font_color=(220, 220, 220),
-                        font_size=22,
+                        font_size=18,
                         margin=(0, 2),
                     )
                 self.menu.add.label(
                     "(see more in highscores...)",
-                    font_size=12,
+                    font_size=16,
                     margin=(0, 5),
                 )
-        self.menu.add.label("", font_size=10, margin=(0, 10))
-
-        self.menu.add.button('Play', self.play_function)
-        self.menu.add.button('Instructions', self.show_instructions)
-        self.menu.add.button('Highscores', self.show_highscores)
-        self.menu.add.button('Quit', self.quit_function)
 
     def play_function(self) -> None:
         self.action = "PLAY"
