@@ -251,3 +251,8 @@ We track progress, weekly sprints, and task division in the [project_management/
 - [Trello Board](https://trello.com/b/Z480iQSZ/to-dos): Sprint to-dos and task cards
 
 ### Resources
+
+- https://pyga.me/docs/
+- https://www.youtube.com/watch?v=8OMghdHP-zs
+
+AI was used as a learning assistant rather than a replacement for independent development. All implementation decisions, code integration, and testing were carried out by the project developers.
