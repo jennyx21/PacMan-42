@@ -5,6 +5,7 @@ from src.menu import GameMenu
 from src.drawmaze import DrawMaze
 from src.maze_loader import MazeLoader, MazeLoaderError
 from src.parser import GameConfig
+from src.asset_helper import resource_path
 
 
 class GameState(Enum):
@@ -243,8 +244,9 @@ class GameManager:
 
     def _handle_instructions(self) -> None:
         controls = pg.image.load(
-            "src/assets/instruction_assets/instruction.png")
-        rules = pg.image.load("src/assets/instruction_assets/rules.png")
+            resource_path("src/assets/instruction_assets/instruction.png"))
+        rules = pg.image.load(
+            resource_path("src/assets/instruction_assets/rules.png"))
 
         for page in (controls, rules):
             self.screen.blit(page, (0, 0))
