@@ -6,7 +6,9 @@ This directory tracks task breakdown, development phases, and planned vs. actual
 
     project_management/
     ├── README.md                  # Index of project management
-    └── timeline.md                # Tracking planned vs. actual progress
+    ├── timeline.md                # Tracking planned vs. actual progress
+    ├── risks.md                   # Risk analysis and mitigations
+    └── bugs.md                    # Bugs found/fixed and acceptance tests
 
 ## Tools & Tracking
 
@@ -17,7 +19,7 @@ We use a shared [Trello Board](https://trello.com/b/Z480iQSZ/to-dos) for managin
 - **Weng**: 
 Project setup (`Makefile`, `pyproject.toml`), 
 `ConfigParser` (`src/parser.py`), 
-`MazeLoader` & fallback (`src/maze_loader.py`), 
+`MazeLoader` (`src/maze_loader.py`), 
 `HighscoreRecord` / `Leaderboard` / `NameInput` (`src/highscores.py`), 
 `GameMenu` (`src/menu.py`), 
 `GameManager` state machine (`src/game_manager.py`), 
