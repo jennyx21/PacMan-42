@@ -13,7 +13,7 @@ class Pacgum(pg.sprite.Sprite):
                  points_pg: int,
                  points_spg: int,
                  maze: list[list[int]],
-                 cell_size: int,
+                 cell_size: float,
                  pacman: PacMan,
                  game: Game):
         super().__init__()
@@ -30,7 +30,7 @@ class Pacgum(pg.sprite.Sprite):
         self.distributed_pacgum = self._distribute()
         self.distribute_superpacgum = self._distribute_super()
 
-    def _distribute(self):
+    def _distribute(self) -> set[tuple[float, float]]:
         cells = [(x, y)
                  for y in range(len(self.maze))
                  for x in range(len(self.maze[0]))
@@ -39,7 +39,7 @@ class Pacgum(pg.sprite.Sprite):
         return {((x + 0.5) * self.cell_size, (y + 0.5) * self.cell_size)
                 for x, y in chosen}
 
-    def _distribute_super(self):
+    def _distribute_super(self) -> list[tuple[float, float]]:
         cell = []
         cell.append((0.5 * self.cell_size, 0.5 * self.cell_size))
         cell.append((len(self.maze) * self.cell_size - 0.5 * self.cell_size,
@@ -50,12 +50,12 @@ class Pacgum(pg.sprite.Sprite):
                     len(self.maze) * self.cell_size - 0.5 * self.cell_size))
         return cell
 
-    def _detect_coaliton(self, rect):
-        if rect.colliderect(self.pacman):
+    def _detect_coaliton(self, rect: pg.Rect) -> bool:
+        if rect.colliderect(self.pacman.rect):
             return True
         return False
 
-    def draw_pacgum(self):
+    def draw_pacgum(self) -> None:
         gum = pg.Surface((5, 5))
         gum_list = []
         for e in list(self.distributed_pacgum):
@@ -70,13 +70,13 @@ class Pacgum(pg.sprite.Sprite):
             g, r = i
             self.screen.blit(g, r)
 
-    def signal_return(self):
+    def signal_return(self) -> None:
         current_tic = pg.time.get_ticks()
         if current_tic > self.timer:
             self.game.reset_signal()
         return
 
-    def draw_superpacgum(self):
+    def draw_superpacgum(self) -> None:
         supergum = pg.Surface((10, 10))
         super_gum_list = []
         if self.game.signal:
@@ -98,6 +98,6 @@ class Pacgum(pg.sprite.Sprite):
             g, r = i
             self.screen.blit(g, r)
 
-    def run_gums(self):
+    def run_gums(self) -> None:
         self.draw_pacgum()
         self.draw_superpacgum()

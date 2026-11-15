@@ -9,7 +9,7 @@ def frame_number(path: Path) -> int:
     return int(match.group(1)) if match else 0
 
 
-def asset_loader(name: str, direction: str, size: int) -> list[Surface]:
+def asset_loader(name: str, direction: str, size: float) -> list[Surface]:
     loaded_assets = []
     asset_dir = Path(f"src/assets/{name}_assets")
     files = sorted(asset_dir.glob(f"{name}_{direction}*.png"),

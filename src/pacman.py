@@ -32,7 +32,7 @@ class PacMan(pg.sprite.Sprite, Game):
         self.sprite_up = asset_loader("Pac-Man", "up", len(self.maze))
 
         self.current_sprite = self.sprite_right
-        self.current = 0
+        self.current: float = 0
         self.start_cell = start_cell
         self.col, self.row = start_cell
         self.old_col = 0
@@ -47,13 +47,13 @@ class PacMan(pg.sprite.Sprite, Game):
     def current_cell(self) -> tuple[int, int]:
         return int(self.x // self.cell_size), int(self.y // self.cell_size)
 
-    def new_cell(self, row, col):
+    def new_cell(self, row: int, col: int) -> None:
         if not row == self.old_row or not col == self.old_col:
             self.old_row = row
             self.old_col = col
             self.next_direction = self.direction
 
-    def read_keys(self):
+    def read_keys(self) -> None:
         keys = pg.key.get_pressed()
         if keys[pg.K_w] or keys[pg.K_UP]:
             self.next_direction = UP
@@ -64,7 +64,7 @@ class PacMan(pg.sprite.Sprite, Game):
         elif keys[pg.K_a] or keys[pg.K_LEFT]:
             self.next_direction = LEFT
 
-    def update_sprite(self, direction: int):
+    def update_sprite(self, direction: int) -> None:
         if direction == UP:
             self.current_sprite = self.sprite_up
         elif direction == RIGHT:
@@ -80,7 +80,7 @@ class PacMan(pg.sprite.Sprite, Game):
             return True
         return False
 
-    def distance_to_center(self):
+    def distance_to_center(self) -> float:
         col, row = self.current_cell()
         center_x, center_y = self.cell_center(col, row)
         if self.direction == UP:
@@ -93,7 +93,7 @@ class PacMan(pg.sprite.Sprite, Game):
             return center_x - self.x
         return 0
 
-    def draw_pacman(self, x: int, y: int):
+    def draw_pacman(self) -> None:
         speed = 1.8 + 10 / len(self.maze)
         col, row = self.current_cell()
         start, pause = self.game.game_info()

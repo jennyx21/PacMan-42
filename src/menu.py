@@ -13,7 +13,7 @@ class GameMenu:
     ) -> None:
         self.surface = surface
         self.menue_backround = asset_loader("Menu", "start", 20)
-        self.current = 0
+        self.current: float = 0
         self.highscores = highscores
         self.width, self.height = surface.get_size()
 
@@ -53,7 +53,6 @@ class GameMenu:
         self.menu.add.button('Highscores', self.show_highscores)
         self.menu.add.button('Quit', self.quit_function)
         self.menu.add.label("", font_size=1, margin=(0, 10))
-        
         self.menu.add.label(
             "--- BEST RECORDS ---",
             font_color=(255, 255, 0),

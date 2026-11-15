@@ -225,7 +225,8 @@ class NameInput:
                         name = name[:-1]
                         msg = ""
                     else:
-                        if not (event.unicode.isalnum() or event.unicode == " "):
+                        if not (event.unicode.isalnum()
+                                or event.unicode == " "):
                             if event.unicode:
                                 msg = "Uh oh, only letters, numbers, " \
                                     "and spaces please"

@@ -33,10 +33,13 @@ class DrawMaze:
         self.points_super_pacgum = points_spg
         self.points_ghost = points_ghost
         self.lives = lives
-        self.screen = screen
         self.score = score
         self.level = level
         self.max_time = max_time
+
+        if screen is None:
+            raise RuntimeError()
+        self.screen: Surface = screen
 
     def _find_spawn_cell(self) -> tuple[int, int]:
         row = len(self.maze) // 2
@@ -47,7 +50,10 @@ class DrawMaze:
         return col, row
 
     def _init_entities(self, field: Surface, background: Surface,
-                       cell_size: float, spawn_col: int, spawn_row: int):
+                       cell_size: float,
+                       spawn_col: int,
+                       spawn_row: int) -> tuple[Game, PacMan, Pacgum,
+                                                Blinky, Pinky, Inky, Clyde]:
         game = Game(background, self.score, self.lives, self.level,
                     self.max_time)
         pacman = PacMan(field,
@@ -136,12 +142,14 @@ class DrawMaze:
 
     def window(self, screen: Surface | None = None,
                clock: pg.time.Clock | None = None) -> Results:
+        whidth: int
+        height: int
         standalone = screen is None
         if standalone:
             pg.init()
             clock = pg.time.Clock()
-            whidth: int = 700
-            height: int = 700
+            whidth = 700
+            height = 700
             self.screen = pg.display.set_mode(
                 (whidth + 2 * 50, height + 2 * 50))
             pg.display.set_caption("Pac Man")
@@ -151,8 +159,8 @@ class DrawMaze:
         if clock is None:
             clock = pg.time.Clock()
 
-        whidth: int = 700
-        height: int = 700
+        whidth = 700
+        height = 700
         cell_size = whidth / len(self.maze)
         spawn_col, spawn_row = self._find_spawn_cell()
         background = pg.Surface((whidth + 2 * 50, height + 2 * 50))
@@ -180,8 +188,7 @@ class DrawMaze:
             self.draw_walls(cell_size, field, (100, 90, 175), 8, 3)
             self.draw_walls(cell_size, field, (175, 170, 255), 3)
 
-            pacman.draw_pacman(int(spawn_col * cell_size),
-                               int(spawn_row * cell_size))
+            pacman.draw_pacman()
             pacgum.run_gums()
             blinky.run_blinky()
             pinky.run_pinky()
@@ -221,7 +228,7 @@ class DrawMaze:
                    screen: Surface,
                    color: tuple[int, int, int],
                    size: int,
-                   length: int = 0):
+                   length: int = 0) -> None:
         x: float = 0
         y: float = 0
         for a in range(len(self.maze)):

@@ -31,14 +31,14 @@ class Ghosts(pg.sprite.Sprite):
     def cell_center(self, col: int, row: int) -> tuple[float, float]:
         return ((col + 0.5) * self.cell_size), (row + 0.5) * self.cell_size
 
-    def current_cell(self, x: int, y: int) -> tuple[int, int]:
+    def current_cell(self, x: float, y: float) -> tuple[int, int]:
         return int(x // self.cell_size), int(y // self.cell_size)
 
-    def find_target(self):
+    def find_target(self) -> tuple[int, int]:
         t_col, t_row = self.pacman.current_cell()
         return t_col, t_row
 
-    def distance_to_center(self, x: int, y: int, direction: int) -> float:
+    def distance_to_center(self, x: float, y: float, direction: int) -> float:
         col, row = self.current_cell(x, y)
         center_x, center_y = self.cell_center(col, row)
         if direction == UP:
@@ -51,7 +51,8 @@ class Ghosts(pg.sprite.Sprite):
             return center_x - x
         return 0
 
-    def walk_path(self, x: int, y: int, direction: int, speed):
+    def walk_path(self, x: float, y: float,
+                  direction: int, speed: float) -> tuple[float, float]:
         if direction == 1:
             y -= speed
         elif direction == 2:
@@ -62,7 +63,7 @@ class Ghosts(pg.sprite.Sprite):
             x -= speed
         return x, y
 
-    def convert_path_direction(self, path: list[tuple[int, int]]):
+    def convert_path_direction(self, path: list[tuple[int, int]]) -> list[int]:
         i = 0
         j = 1
         directions = []
@@ -93,9 +94,10 @@ class Ghosts(pg.sprite.Sprite):
             i += 1
             if current == goal:
                 path = []
-                while current is not None:
-                    path.append(current)
-                    current = came_from[current]
+                node: tuple[int, int] | None = current
+                while node is not None:
+                    path.append(node)
+                    node = came_from[node]
                 path.reverse()
                 return path
             neighbors = self.neighbors(current[1], current[0])
@@ -127,12 +129,7 @@ class Ghosts(pg.sprite.Sprite):
             neighbors.append(LEFT)
         return neighbors
 
-    def draw_ghosts(self):
-        clyde = pg.Surface((10, 10))
-        clyde.fill("orange")
-        self.screen.blit(clyde, self.clyde_start)
-
-    def flee_direction(self, col: int, row: int, old_direction: int):
+    def flee_direction(self, col: int, row: int, old_direction: int) -> int:
         t_col, t_row = self.find_target()
         neightbors = self.neighbors(row, col)
         if len(neightbors) == 1:
@@ -150,23 +147,27 @@ class Ghosts(pg.sprite.Sprite):
                 return d
         return 0
 
-    def move(self, x: int, y: int,
-             direction: int, speed: int,
-             target: tuple[int, int], path: list[int]):
+    def move(self, x: float, y: float,
+             direction: int, speed: float,
+             target: tuple[int, int],
+             path: list[tuple[int, int]]) -> tuple[list[tuple[int, int]],
+                                                   float, float]:
+        dir_list: list[int] = []
         if 0 <= self.distance_to_center(x, y, direction) < speed:
             col, row = self.current_cell(x, y)
             x, y = self.cell_center(col, row)
             path = self.pathfind(self.current_cell(x, y), target)
-            path = self.convert_path_direction(path)
-            if path:
-                self.direction = path[0]
+            dir_list = self.convert_path_direction(path)
+            if dir_list:
+                self.direction = dir_list[0]
             else:
                 self.direction = 0
         if path:
             x, y = self.walk_path(x, y, direction, speed)
         return path, x, y
 
-    def run(self, x: int, y: int, direction: int, speed: int):
+    def run(self, x: float, y: float,
+            direction: int, speed: float) -> tuple[int, float, float]:
         if 0 <= self.distance_to_center(x, y, direction) < speed:
             col, row = self.current_cell(x, y)
             x, y = self.cell_center(col, row)
@@ -175,13 +176,15 @@ class Ghosts(pg.sprite.Sprite):
             x, y = self.walk_path(x, y, direction, speed)
         return direction, x, y
 
-    def _detect_coaliton_ghosts(self, rect):
-        dist = math.hypot(self.x - self.pacman.x, self.y - self.pacman.y)
+    def _detect_coaliton_ghosts(self, x: float, y: float) -> bool:
+        dist = math.hypot(x - self.pacman.x, y - self.pacman.y)
         return dist < self.cell_size * 0.4
 
-    def vali_t(self, target: tuple[int, int]):
+    def vali_t(self, target: tuple[int, int]) -> tuple[int, int]:
         col, row = target
-        if row > len(self.maze) - 1 or row < 0 or col > len(self.maze) - 1 or col < 0:
+        if (row > len(self.maze) - 1 or
+                row < 0 or
+                col > len(self.maze) - 1 or col < 0):
             return self.find_target()
         if self.maze[row][col] == 15:
             return self.find_target()
@@ -191,7 +194,7 @@ class Ghosts(pg.sprite.Sprite):
 class Blinky(Ghosts):
     def __init__(self,
                  surface: Surface,
-                 cell_size: int,
+                 cell_size: float,
                  maze: list[list[int]],
                  pacman: PacMan,
                  game: Game):
@@ -205,7 +208,7 @@ class Blinky(Ghosts):
         self.blinky_start = (self.x, self.y)
         self.direction = 0
         self.speed = 0.5 + 10 / len(self.maze)
-        self.path: list = None
+        self.path: list[tuple[int, int]] = []
         self.edible = False
         self.edible_timer = 15000
         self.time = 0
@@ -225,10 +228,10 @@ class Blinky(Ghosts):
                                                len(self.maze) / 0.5)
         self.sprite_edibledown = asset_loader("edible", "down",
                                               len(self.maze) / 0.5)
-        self.current = 0
+        self.current: float = 0
         self.current_sprite = self.sprite_down
 
-    def switch_sprite(self):
+    def switch_sprite(self) -> None:
         if self.direction == UP:
             self.current_sprite = self.sprite_up
         if self.direction == DOWN:
@@ -238,7 +241,7 @@ class Blinky(Ghosts):
         if self.direction == RIGHT:
             self.current_sprite = self.sprite_right
 
-    def switch_edible_sprite(self):
+    def switch_edible_sprite(self) -> None:
         if self.direction == UP:
             self.current_sprite = self.sprite_edibleup
         if self.direction == DOWN:
@@ -248,7 +251,7 @@ class Blinky(Ghosts):
         if self.direction == RIGHT:
             self.current_sprite = self.sprite_edibleright
 
-    def run_blinky(self):
+    def run_blinky(self) -> None:
         start, pause = self.game.game_info()
         if start:
             if not pause:
@@ -266,7 +269,7 @@ class Blinky(Ghosts):
                         self.checked = 1
                         self.time = pg.time.get_ticks() + self.edible_timer
 
-                    if (self._detect_coaliton_ghosts(rect)
+                    if (self._detect_coaliton_ghosts(self.x, self.y)
                             and not self.game.cheat
                             and not self.game.live_lost):
                         self.game.loose_lives()
@@ -304,7 +307,7 @@ class Blinky(Ghosts):
                                                               self.y,
                                                               self.direction,
                                                               self.speed)
-                    if self._detect_coaliton_ghosts(rect):
+                    if self._detect_coaliton_ghosts(self.x, self.y):
                         self.x, self.y = self.blinky_start
                         self.edible = False
 # hard codet Points of the ghost.. need to be changed
@@ -323,7 +326,7 @@ class Blinky(Ghosts):
 class Pinky(Ghosts):
     def __init__(self,
                  surface: Surface,
-                 cell_size: int,
+                 cell_size: float,
                  maze: list[list[int]],
                  pacman: PacMan,
                  game: Game):
@@ -337,7 +340,7 @@ class Pinky(Ghosts):
         self.pinky_start = (self.x, self.y)
         self.direction = 0
         self.speed = 0.5 + 10 / len(self.maze)
-        self.path: list = None
+        self.path: list[tuple[int, int]] = []
         self.edible = False
         self.edible_timer = 15000
         self.time = 0
@@ -357,10 +360,10 @@ class Pinky(Ghosts):
                                                len(self.maze) / 0.5)
         self.sprite_edibledown = asset_loader("edible", "down",
                                               len(self.maze) / 0.5)
-        self.current = 0
+        self.current: float = 0
         self.current_sprite = self.sprite_down
 
-    def switch_sprite(self):
+    def switch_sprite(self) -> None:
         if self.direction == UP:
             self.current_sprite = self.sprite_up
         if self.direction == DOWN:
@@ -370,7 +373,7 @@ class Pinky(Ghosts):
         if self.direction == RIGHT:
             self.current_sprite = self.sprite_right
 
-    def switch_edible_sprite(self):
+    def switch_edible_sprite(self) -> None:
         if self.direction == UP:
             self.current_sprite = self.sprite_edibleup
         if self.direction == DOWN:
@@ -380,14 +383,14 @@ class Pinky(Ghosts):
         if self.direction == RIGHT:
             self.current_sprite = self.sprite_edibleright
 
-    def pinky_target(self):
+    def pinky_target(self) -> tuple[int, int]:
         col, row = self.find_target()
         col += 2
         if col > len(self.maze):
             col -= 4
         return col, row
 
-    def run_pinky(self):
+    def run_pinky(self) -> None:
         start, pause = self.game.game_info()
         if start:
             if not pause:
@@ -407,7 +410,7 @@ class Pinky(Ghosts):
                         self.checked = 1
                         self.time = pg.time.get_ticks() + self.edible_timer
 
-                    if (self._detect_coaliton_ghosts(rect)
+                    if (self._detect_coaliton_ghosts(self.x, self.y)
                             and not self.game.cheat
                             and not self.game.live_lost):
                         self.game.loose_lives()
@@ -445,7 +448,7 @@ class Pinky(Ghosts):
                                                               self.y,
                                                               self.direction,
                                                               self.speed)
-                    if self._detect_coaliton_ghosts(rect):
+                    if self._detect_coaliton_ghosts(self.x, self.y):
                         self.x, self.y = self.pinky_start
                         self.edible = False
 # hard codet Points of the ghost.. need to be changed
@@ -464,7 +467,7 @@ class Pinky(Ghosts):
 class Inky(Ghosts):
     def __init__(self,
                  surface: Surface,
-                 cell_size: int,
+                 cell_size: float,
                  maze: list[list[int]],
                  pacman: PacMan,
                  game: Game):
@@ -478,7 +481,7 @@ class Inky(Ghosts):
         self.inky_start = (self.x, self.y)
         self.direction = 0
         self.speed = 0.5 + 10 / len(self.maze)
-        self.path: list = None
+        self.path: list[tuple[int, int]] = []
         self.edible = False
         self.edible_timer = 15000
         self.time = 0
@@ -498,10 +501,10 @@ class Inky(Ghosts):
                                                len(self.maze) / 0.5)
         self.sprite_edibledown = asset_loader("edible", "down",
                                               len(self.maze) / 0.5)
-        self.current = 0
+        self.current: float = 0
         self.current_sprite = self.sprite_down
 
-    def switch_sprite(self):
+    def switch_sprite(self) -> None:
         if self.direction == UP:
             self.current_sprite = self.sprite_up
         if self.direction == DOWN:
@@ -511,7 +514,7 @@ class Inky(Ghosts):
         if self.direction == RIGHT:
             self.current_sprite = self.sprite_right
 
-    def switch_edible_sprite(self):
+    def switch_edible_sprite(self) -> None:
         if self.direction == UP:
             self.current_sprite = self.sprite_edibleup
         if self.direction == DOWN:
@@ -521,14 +524,14 @@ class Inky(Ghosts):
         if self.direction == RIGHT:
             self.current_sprite = self.sprite_edibleright
 
-    def inky_target(self):
+    def inky_target(self) -> tuple[int, int]:
         col, row = self.find_target()
         row += 2
         if row > len(self.maze):
             row -= 4
         return col, row
 
-    def run_inky(self):
+    def run_inky(self) -> None:
         start, pause = self.game.game_info()
         if start:
             if not pause:
@@ -548,7 +551,7 @@ class Inky(Ghosts):
                         self.checked = 1
                         self.time = pg.time.get_ticks() + self.edible_timer
 
-                    if (self._detect_coaliton_ghosts(rect)
+                    if (self._detect_coaliton_ghosts(self.x, self.y)
                             and not self.game.cheat
                             and not self.game.live_lost):
                         self.game.loose_lives()
@@ -586,7 +589,7 @@ class Inky(Ghosts):
                                                               self.y,
                                                               self.direction,
                                                               self.speed)
-                    if self._detect_coaliton_ghosts(rect):
+                    if self._detect_coaliton_ghosts(self.x, self.y):
                         self.x, self.y = self.inky_start
                         self.edible = False
 # hard codet Points of the ghost.. need to be changed
@@ -605,7 +608,7 @@ class Inky(Ghosts):
 class Clyde(Ghosts):
     def __init__(self,
                  surface: Surface,
-                 cell_size: int,
+                 cell_size: float,
                  maze: list[list[int]],
                  pacman: PacMan,
                  game: Game):
@@ -619,7 +622,7 @@ class Clyde(Ghosts):
         self.clyde_start = (self.x, self.y)
         self.direction = 0
         self.speed = 0.5 + 10 / len(self.maze)
-        self.path: list = None
+        self.path: list[tuple[int, int]] = []
         self.edible = False
         self.edible_timer = 15000
         self.time = 0
@@ -639,10 +642,10 @@ class Clyde(Ghosts):
                                                len(self.maze) / 0.5)
         self.sprite_edibledown = asset_loader("edible", "down",
                                               len(self.maze) / 0.5)
-        self.current = 0
+        self.current: float = 0
         self.current_sprite = self.sprite_down
 
-    def switch_sprite(self):
+    def switch_sprite(self) -> None:
         if self.direction == UP:
             self.current_sprite = self.sprite_up
         if self.direction == DOWN:
@@ -652,7 +655,7 @@ class Clyde(Ghosts):
         if self.direction == RIGHT:
             self.current_sprite = self.sprite_right
 
-    def switch_edible_sprite(self):
+    def switch_edible_sprite(self) -> None:
         if self.direction == UP:
             self.current_sprite = self.sprite_edibleup
         if self.direction == DOWN:
@@ -662,15 +665,14 @@ class Clyde(Ghosts):
         if self.direction == RIGHT:
             self.current_sprite = self.sprite_edibleright
 
-    def clyde_target(self):
+    def clyde_target(self) -> tuple[int, int]:
         col, row = self.find_target()
         col -= 2
         if col < 0:
             col += 4
         return col, row
 
-
-    def run_clyde(self):
+    def run_clyde(self) -> None:
         start, pause = self.game.game_info()
         if start:
             if not pause:
@@ -690,7 +692,7 @@ class Clyde(Ghosts):
                         self.checked = 1
                         self.time = pg.time.get_ticks() + self.edible_timer
 
-                    if (self._detect_coaliton_ghosts(rect)
+                    if (self._detect_coaliton_ghosts(self.x, self.y)
                             and not self.game.cheat
                             and not self.game.live_lost):
                         self.game.loose_lives()
@@ -722,13 +724,13 @@ class Clyde(Ghosts):
                     if self.time <= pg.time.get_ticks():
                         self.edible = False
                     if self.game.live_lost:
-                         self.game.ghosts_arrived.add("clyde")
+                        self.game.ghosts_arrived.add("clyde")
                     self.speed = 1 + 10 / len(self.maze)
                     self.direction, self.x, self.y = self.run(self.x,
                                                               self.y,
                                                               self.direction,
                                                               self.speed)
-                    if self._detect_coaliton_ghosts(rect):
+                    if self._detect_coaliton_ghosts(self.x, self.y):
                         self.x, self.y = self.clyde_start
                         self.edible = False
 # hard codet Points of the ghost.. need to be changed
