@@ -46,6 +46,90 @@ class DrawMaze:
             col -= 1
         return col, row
 
+    def _init_entities(self, field: Surface, background: Surface,
+                       cell_size: float, spawn_col: int, spawn_row: int):
+        game = Game(background, self.score, self.lives, self.level,
+                    self.max_time)
+        pacman = PacMan(field,
+                        game,
+                        self.maze,
+                        cell_size,
+                        (spawn_col, spawn_row),
+                        self.lives)
+        pacgum = Pacgum(field,
+                        self.pacgum,
+                        self.superpacgum,
+                        self.points_pacgum,
+                        self.points_super_pacgum,
+                        self.maze,
+                        cell_size,
+                        pacman,
+                        game)
+        blinky = Blinky(field, cell_size, self.maze, pacman, game)
+        pinky = Pinky(field, cell_size, self.maze, pacman, game)
+        inky = Inky(field, cell_size, self.maze, pacman, game)
+        clyde = Clyde(field, cell_size, self.maze, pacman, game)
+        return game, pacman, pacgum, blinky, pinky, inky, clyde
+
+    def _handle_events(self, game: Game) -> tuple[bool, str]:
+        for event in pg.event.get():
+            if event.type is pg.QUIT:
+                return False, "QUIT"
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_c:
+                    game.turn_on_cheat()
+                elif event.key == pg.K_ESCAPE:
+                    return False, "BACK"
+                elif event.key == pg.K_SPACE:
+                    game.update_start()
+                elif game.cheat:
+                    if event.key is pg.K_t:
+                        game.cheat_mode("time")
+                    elif event.key is pg.K_l:
+                        game.cheat_mode("lives")
+                    elif event.key is pg.K_x:
+                        game.cheat_mode("return")
+                    elif event.key is pg.K_n:
+                        return False, "WIN"
+        return True, ""
+
+    def _draw_overlays(self, start: bool, pause: bool,
+                       font_pause: pg.font.Font, font_sub: pg.font.Font) -> None:
+        if not start:
+            overlay = pg.Surface(self.screen.get_size(), pg.SRCALPHA)
+            overlay.fill((0, 0, 0, 160))
+            self.screen.blit(overlay, (0, 0))
+
+            banner_surf = font_sub.render(
+                "PRESS SPACE TO START", True, (255, 255, 0))
+            self.screen.blit(
+                banner_surf,
+                banner_surf.get_rect(center=(self.screen.get_width() // 2,
+                                             self.screen.get_height() // 2)))
+        elif pause:
+            overlay = pg.Surface(self.screen.get_size(), pg.SRCALPHA)
+            overlay.fill((0, 0, 0, 160))
+            self.screen.blit(overlay, (0, 0))
+
+            pause_surf = font_pause.render("PAUSED", True, (255, 255, 0))
+            self.screen.blit(
+                pause_surf,
+                pause_surf.get_rect(center=(self.screen.get_width() // 2,
+                                            self.screen.get_height() // 2 - 25)))
+
+            resume_surf = font_sub.render(
+                "PRESS SPACE TO RESUME", True, (200, 200, 200))
+            self.screen.blit(
+                resume_surf,
+                resume_surf.get_rect(center=(self.screen.get_width() // 2,
+                                             self.screen.get_height() // 2 + 25)))
+            resume_surf = font_sub.render(
+                " OR ESC TO EXIT", True, (200, 200, 200))
+            self.screen.blit(
+                resume_surf,
+                resume_surf.get_rect(center=(self.screen.get_width() // 2,
+                                             self.screen.get_height() // 2 + 65)))
+
     def window(self, screen: Surface | None = None, clock: pg.time.Clock | None = None) -> Results:
         standalone = screen is None
         if standalone:
@@ -68,27 +152,10 @@ class DrawMaze:
         spawn_col, spawn_row = self._find_spawn_cell()
         background = pg.Surface((whidth + 2 * 50, height + 2 * 50))
         field = pg.Surface((whidth, height))
-        game = Game(background, self.score, self.lives, self.level,
-                    self.max_time)
-        pacman = PacMan(field,
-                        game,
-                        self.maze,
-                        cell_size,
-                        (spawn_col, spawn_row),
-                        self.lives)
-        pacgum = Pacgum(field,
-                        self.pacgum,
-                        self.superpacgum,
-                        self.points_pacgum,
-                        self.points_super_pacgum,
-                        self.maze,
-                        cell_size,
-                        pacman,
-                        game)
-        blinky = Blinky(field, cell_size, self.maze, pacman, game)
-        pinky = Pinky(field, cell_size, self.maze, pacman, game)
-        inky = Inky(field, cell_size, self.maze, pacman, game)
-        clyde = Clyde(field, cell_size, self.maze, pacman, game)
+
+        (game, pacman, pacgum,
+         blinky, pinky, inky, clyde) = self._init_entities(
+             field, background, cell_size, spawn_col, spawn_row)
 
         font_pause = pg.font.Font(None, 64)
         font_sub = pg.font.Font(None, 28)
@@ -96,29 +163,10 @@ class DrawMaze:
         outcome = "QUIT"
 
         while running:
-            events = pg.event.get()
-            for event in events:
-                if event.type is pg.QUIT:
-                    outcome = "QUIT"
-                    running = False
-                elif event.type == pg.KEYDOWN:
-                    if event.key == pg.K_c:
-                        game.turn_on_cheat()
-                    elif event.key == pg.K_ESCAPE:
-                        outcome = "BACK"
-                        running = False
-                    elif event.key == pg.K_SPACE:
-                        game.update_start()
-                    elif game.cheat:
-                        if event.key is pg.K_t:
-                            game.cheat_mode("time")
-                        elif event.key is pg.K_l:
-                            game.cheat_mode("lives")
-                        elif event.key is pg.K_x:
-                            game.cheat_mode("return")
-                        elif event.key is pg.K_n:
-                            outcome = "WIN"
-                            running = False
+            running, event_outcome = self._handle_events(game)
+            if not running:
+                outcome = event_outcome
+                break
 
             start, pause = game.game_info()
             game.reset_signal()
@@ -142,94 +190,21 @@ class DrawMaze:
 
             if game.level_lost:
                 outcome = "LOSE"
-                running = False
+                break
 
             if game.level_win:
                 outcome = "WIN"
-                running = False
+                break
 
             self.screen.blit(background, background.get_rect())
             self.screen.blit(field,
                              field.get_rect(center=self.screen.
                                             get_rect().center))
 
-            # dim screen before start, pause and game over
-            if not start:
-                overlay = pg.Surface(self.screen.get_size(), pg.SRCALPHA)
-                overlay.fill((0, 0, 0, 160))
-                self.screen.blit(overlay, (0, 0))
-
-                banner_surf = font_sub.render(
-                    "PRESS SPACE TO START", True, (255, 255, 0))
-                self.screen.blit(
-                    banner_surf,
-                    banner_surf.get_rect(center=(self.screen.get_width() // 2,
-                                                 self.screen.get_height() // 2)))
-            elif pause:
-                overlay = pg.Surface(self.screen.get_size(), pg.SRCALPHA)
-                overlay.fill((0, 0, 0, 160))
-                self.screen.blit(overlay, (0, 0))
-
-                pause_surf = font_pause.render("PAUSED", True, (255, 255, 0))
-                self.screen.blit(
-                    pause_surf,
-                    pause_surf.get_rect(center=(self.screen.get_width() // 2,
-                                                 self.screen.get_height() // 2 - 25)))
-
-                resume_surf = font_sub.render(
-                    "PRESS SPACE TO RESUME", True, (200, 200, 200))
-                self.screen.blit(
-                    resume_surf,
-                    resume_surf.get_rect(center=(self.screen.get_width() // 2,
-                                                 self.screen.get_height() // 2 + 25)))
-                resume_surf = font_sub.render(
-                    " OR ESC TO EXIT", True, (200, 200, 200))
-                self.screen.blit(
-                    resume_surf,
-                    resume_surf.get_rect(center=(self.screen.get_width() // 2,
-                                                 self.screen.get_height() // 2 + 65)))
+            self._draw_overlays(start, pause, font_pause, font_sub)
 
             pg.display.flip()
             clock.tick(60)
-
-        if outcome in ("LOSE", "WIN"):
-            overlay = pg.Surface(self.screen.get_size(), pg.SRCALPHA)
-            overlay.fill((0, 0, 0, 180))
-            self.screen.blit(overlay, (0, 0))
-
-            title = "GAME OVER" if outcome == "LOSE" else "YOU WIN!"
-            color = (255, 60, 60) if outcome == "LOSE" else (60, 255, 60)
-            over_surf = font_pause.render(title, True, color)
-            self.screen.blit(
-                over_surf,
-                over_surf.get_rect(center=(self.screen.get_width() // 2,
-                                           self.screen.get_height() // 2 - 30)))
-
-            score_surf = font_sub.render(
-                f"FINAL SCORE: {game.highscore}", True, (255, 255, 0))
-            self.screen.blit(
-                score_surf,
-                score_surf.get_rect(center=(self.screen.get_width() // 2,
-                                            self.screen.get_height() // 2 + 20)))
-
-            prompt_surf = font_sub.render(
-                "PRESS ANY KEY TO CONTINUE...", True, (200, 200, 200))
-            self.screen.blit(
-                prompt_surf,
-                prompt_surf.get_rect(center=(self.screen.get_width() // 2,
-                                             self.screen.get_height() // 2 + 65)))
-
-            pg.display.flip()
-
-            waiting = True
-            while waiting:
-                for event in pg.event.get():
-                    if event.type == pg.QUIT:
-                        outcome = "QUIT"
-                        waiting = False
-                    elif event.type == pg.KEYDOWN:
-                        waiting = False
-                clock.tick(60)
 
         if standalone:
             pg.quit()
@@ -244,9 +219,8 @@ class DrawMaze:
                    length: int = 0):
         x: float = 0
         y: float = 0
-        i: int = 0
         for a in range(len(self.maze)):
-            for b in range(len(self.maze[i])):
+            for b in range(len(self.maze[a])):
                 cell = self.maze[b][a]
                 x = b * cell_size
                 y = a * cell_size
@@ -264,5 +238,4 @@ class DrawMaze:
                 if cell & 8:
                     pg.draw.line(screen, color,
                                  (y, x), (y, x + cell_size), size)
-            i += 1
         return
