@@ -88,43 +88,43 @@ A demo of config.json:
             },
             {
                 "level": 3,
-                "width": 17,
-                "height": 17
+                "width": 15,
+                "height": 15
             },
             {
                 "level": 4,
-                "width": 17,
-                "height": 17
+                "width": 15,
+                "height": 15
             },
             {
                 "level": 5,
-                "width": 19,
-                "height": 19
+                "width": 15,
+                "height": 15
             },
             {
                 "level": 6,
-                "width": 19,
-                "height": 19
+                "width": 15,
+                "height": 15
             },
             {
                 "level": 7,
-                "width": 21,
-                "height": 21
+                "width": 15,
+                "height": 15
             },
             {
                 "level": 8,
-                "width": 23,
-                "height": 23
+                "width": 15,
+                "height": 15
             },
             {
                 "level": 9,
-                "width": 23,
-                "height": 23
+                "width": 15,
+                "height": 15
             },
             {
                 "level": 10,
-                "width": 25,
-                "height": 25
+                "width": 15,
+                "height": 15
             }
         ]
     }
@@ -251,8 +251,15 @@ We track progress, weekly sprints, and task division in the [project_management/
 - [Trello Board](https://trello.com/b/Z480iQSZ/to-dos): Sprint to-dos and task cards
 
 ### Resources
+- [Python whl](https://opensource.com/article/23/1/packaging-python-modules-wheels)
+- [pygame-menu guide](https://gamedevacademy.org/pygame-menu-tutorial-complete-guide/)
+- [pygame-menu create menu](https://coderslegacy.com/python/create-menu-screens-in-pygame-tutorial/)
+- [pygame screen blit vs flip](https://realpython.com/lessons/using-blit-and-flip/)
+- [pygame documentation](https://pyga.me/docs/)
+- [pygame tutorial](https://www.youtube.com/watch?v=8OMghdHP-zs)
 
-- https://pyga.me/docs/
-- https://www.youtube.com/watch?v=8OMghdHP-zs
-
-AI was used as a learning assistant rather than a replacement for independent development. All implementation decisions, code integration, and testing were carried out by the project developers.
+### AI usage:
+- we used AI to explore python and pygame functions
+- to explain errors and debug
+- to explain when stuck at some points
+- to structure sentences better for README
