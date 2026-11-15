@@ -5,6 +5,7 @@ from src.menu import GameMenu
 from src.drawmaze import DrawMaze, Results
 from src.maze_loader import MazeLoader, MazeLoaderError
 from src.parser import GameConfig
+from src.asset_helper import asset_loader
 
 
 class GameState(Enum):
@@ -12,6 +13,7 @@ class GameState(Enum):
     PLAYING = auto()
     NAME_INPUT = auto()
     HIGHSCORES = auto()
+    INSTRUCTIONS = auto()
     QUIT = auto()
 
 
@@ -27,12 +29,16 @@ class GameManager:
 
         # menu
         self.menu = GameMenu(self.screen)
+        # self.instruction = asset_loader()
 
         # resources
         self.config = config if config is not None else GameConfig()
         self.highscores = HighscoreRecord(self.config.highscore_filename)
         self.leaderboard = Leaderboard(self.highscores)
         self.name_input = NameInput(self.highscores)
+
+        # menu
+        self.menu = GameMenu(self.screen, self.highscores)
 
         # current
         self.state = GameState.MENU
@@ -50,6 +56,8 @@ class GameManager:
                 self._handle_name_input()
             elif self.state == GameState.HIGHSCORES:
                 self._handle_highscores()
+            # elif self.state == GameState.INSTRUCTIONS:
+            #     self._handle_instructions()
             elif self.state == GameState.QUIT:
                 self.running = False
 
@@ -66,11 +74,17 @@ class GameManager:
 
     def _handle_playing(self) -> None:
         level = self.config.levels[0]
-        maze_data = MazeLoader.load(
-            width=level.width,
-            height=level.height,
-            seed=self.config.seed,
-        )
+        try:
+            maze_data = MazeLoader.load(
+                width=level.width,
+                height=level.height,
+                seed=self.config.seed,
+            )
+        except MazeLoaderError as e:
+            print(f"MazeLoaderError: {e}")
+            self.state = GameState.MENU
+            return
+
         game_loop = DrawMaze(
             maze=maze_data.grid,
             pacgum=self.config.pacgum,
@@ -110,6 +124,13 @@ class GameManager:
             self.running = False
         else:
             self.state = GameState.MENU
+
+    # def _handle_instructions(self) -> None:
+        # action = asset_loader(self.)
+        # if action == "QUIT":
+        #     self.running = False
+        # else:
+        #     self.state = GameState.MENU
 
 
 if __name__ == "__main__":

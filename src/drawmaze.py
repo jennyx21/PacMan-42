@@ -174,7 +174,7 @@ class DrawMaze:
                 self.screen.blit(
                     pause_surf,
                     pause_surf.get_rect(center=(self.screen.get_width() // 2,
-                                                 self.screen.get_height() // 2 - 25)))
+                                                self.screen.get_height() // 2 - 25)))
 
                 resume_surf = font_sub.render(
                     "PRESS SPACE TO RESUME", True, (200, 200, 200))
