@@ -1,7 +1,16 @@
 from pathlib import Path
+import sys
 from pygame import Surface
 import pygame
 import re
+
+
+def resource_path(relative: str) -> Path:
+    """Path that works both normally and inside a PyInstaller build."""
+    base = getattr(sys, "_MEIPASS", None)
+    if base is not None:
+        return Path(base) / relative
+    return Path(__file__).resolve().parent.parent / relative
 
 
 def frame_number(path: Path) -> int:
@@ -11,7 +20,7 @@ def frame_number(path: Path) -> int:
 
 def asset_loader(name: str, direction: str, size: float) -> list[Surface]:
     loaded_assets = []
-    asset_dir = Path(f"src/assets/{name}_assets")
+    asset_dir = resource_path(f"src/assets/{name}_assets")
     files = sorted(asset_dir.glob(f"{name}_{direction}*.png"),
                    key=frame_number)
     for i in files:

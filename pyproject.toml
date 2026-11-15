@@ -13,3 +13,8 @@ dependencies = [
 [[tool.mypy.overrides]]
     module = "mazegenerator.*"
     ignore_missing_imports = true
+
+[dependency-groups]
+dev = [
+    "pyinstaller>=6.22.3",
+]

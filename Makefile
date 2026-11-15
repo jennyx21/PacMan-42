@@ -3,6 +3,16 @@ MAIN = pac-man.py
 CONFIG = config.json
 LINT_CHECK = src/
 
+exe:
+	rm -rf build dist
+	uv run pyinstaller --onefile --windowed --name PacMan \
+		--add-data "src/assets:src/assets" \
+		--add-data "config.json:." \
+		--collect-all pygame_menu \
+		--hidden-import mazegenerator.mazegenerator \
+		pac-man.py
+	cd dist && zip PacMan-linux.zip PacMan
+
 install:
 	uv sync
 	@if [ -f src/mazegenerator*.whl ]; then UV_SKIP_WHEEL_FILENAME_CHECK=1 uv pip install src/mazegenerator*.whl; fi
