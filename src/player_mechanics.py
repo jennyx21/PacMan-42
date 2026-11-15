@@ -22,6 +22,7 @@ class Game():
         self.level_win = False
         self.level_lost = False
         self.cheat_time = False
+        self.ghosts_arrived = set()
 
         self.live_on_spirete = asset_loader("lives", "on", 20)
         self.live_off_spirete = asset_loader("lives", "off", 20)
@@ -59,7 +60,9 @@ class Game():
 
     def reset_signal(self):
         self.signal = 0
-        self.live_lost = False
+        if len(self.ghosts_arrived) == 4:
+            self.ghosts_arrived.clear()
+            self.live_lost = False
 
     def update_edibility(self, edible_state: bool):
         if edible_state is False:
@@ -116,7 +119,6 @@ class Game():
         elif mode == "time":
             self.cheat_time = True
         elif mode == "return":
-            print("hello")
             self.cheat = False
 
     def display_time(self):

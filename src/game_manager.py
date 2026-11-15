@@ -43,6 +43,7 @@ class GameManager:
         # current
         self.state = GameState.MENU
         self.current_score = 0
+        self.current_lives = self.config.lives
         self.running = True
 
     def run(self) -> None:
@@ -73,40 +74,46 @@ class GameManager:
             self.state = GameState.QUIT
 
     def _handle_playing(self) -> None:
-        level = self.config.levels[0]
-        try:
-            maze_data = MazeLoader.load(
-                width=level.width,
-                height=level.height,
-                seed=self.config.seed,
-            )
-        except MazeLoaderError as e:
-            print(f"MazeLoaderError: {e}")
-            self.state = GameState.MENU
-            return
+        for i in range(10):
+            if self.running:
+                level = self.config.levels[i]
+                try:
+                    maze_data = MazeLoader.load(
+                        width=level.width,
+                        height=level.height,
+                        seed=self.config.seed,
+                    )
+                except MazeLoaderError as e:
+                    print(f"MazeLoaderError: {e}")
+                    self.state = GameState.MENU
+                    return
 
-        game_loop = DrawMaze(
-            maze=maze_data.grid,
-            pacgum=self.config.pacgum,
-            superpacgum=4,
-            points_pg=self.config.points_per_pacgum,
-            points_spg=self.config.points_per_super_pacgum,
-            points_ghost=self.config.points_per_ghost,
-            lives=self.config.lives,
-            max_time=self.config.level_max_time,
-            screen=self.screen,
-            score=self.current_score,
-            level=1,
-        )
-        result = game_loop.window(self.screen, self.clock)
-        self.current_score = result.score
+                game_loop = DrawMaze(
+                    maze=maze_data.grid,
+                    pacgum=self.config.pacgum,
+                    superpacgum=4,
+                    points_pg=self.config.points_per_pacgum,
+                    points_spg=self.config.points_per_super_pacgum,
+                    points_ghost=self.config.points_per_ghost,
+                    lives=self.current_lives,
+                    max_time=self.config.level_max_time,
+                    screen=self.screen,
+                    score=self.current_score,
+                    level=i + 1,
+                )
+                result = game_loop.window(self.screen, self.clock)
+                self.current_score = result.score
+                self.current_lives = result.lives
 
-        if result.outcome == "QUIT":
-            self.running = False
-        elif result.outcome == "BACK":
-            self.state = GameState.MENU
-        else:
-            self.state = GameState.NAME_INPUT
+                if result.outcome == "QUIT":
+                    self.running = False
+                elif result.outcome == "BACK":
+                    self.state = GameState.MENU
+                    return
+                elif result.outcome == "LOSE":
+                    self.state = GameState.NAME_INPUT
+                    return
+        self.state = GameState.NAME_INPUT
 
     def _handle_name_input(self) -> None:
         action = self.name_input.get_name(

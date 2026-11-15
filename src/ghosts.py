@@ -249,7 +249,6 @@ class Blinky(Ghosts):
             self.current_sprite = self.sprite_edibleright
 
     def run_blinky(self):
-        self
         start, pause = self.game.game_info()
         if start:
             if not pause:
@@ -276,6 +275,7 @@ class Blinky(Ghosts):
                                                                         col)
                         self.x, self.y = self.blinky_start
                     elif self.game.live_lost:
+                        self.game.ghosts_arrived.add("blinky")
                         self.x, self.y = self.blinky_start
                     self.switch_sprite()
                 else:
@@ -358,7 +358,6 @@ class Pinky(Ghosts):
         self.current = 0
         self.current_sprite = self.sprite_down
 
-
     def switch_sprite(self):
         if self.direction == UP:
             self.current_sprite = self.sprite_up
@@ -415,6 +414,7 @@ class Pinky(Ghosts):
                                                                         col)
                         self.x, self.y = self.pinky_start
                     elif self.game.live_lost:
+                        self.game.ghosts_arrived.add("pinky")
                         self.x, self.y = self.pinky_start
                     self.switch_sprite()
                 else:
@@ -553,6 +553,7 @@ class Inky(Ghosts):
                                                                         col)
                         self.x, self.y = self.inky_start
                     elif self.game.live_lost:
+                        self.game.ghosts_arrived.add("inky")
                         self.x, self.y = self.inky_start
                     self.switch_sprite()
                 else:
@@ -692,8 +693,8 @@ class Clyde(Ghosts):
                                                                         col)
                         self.x, self.y = self.clyde_start
                     elif self.game.live_lost:
+                        self.game.ghosts_arrived.add("clyde")
                         self.x, self.y = self.clyde_start
-
                     self.switch_sprite()
                 else:
                     if self.game.signal and self.checked == 0:
